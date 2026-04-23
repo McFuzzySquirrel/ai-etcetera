@@ -1,0 +1,54 @@
+# Dirk configuration — Holistic Discovery
+#
+# Controls how the Dirk agent scans your repositories and surfaces connections.
+# Every value below is the default; uncomment and edit to override.
+
+# Scope — which repositories Dirk should consider.
+scope:
+  # Path to a hand-maintained list of repos. Takes precedence over auto-discovery.
+  source: repos.yml
+  # Optionally pull additional repos from a GitHub user or org.
+  # github_user: McFuzzySquirrel
+  # github_org: ~
+  # include_private: false
+
+# Depth of the scan.
+#   quick    — metadata only (languages, deps, topics)
+#   standard — + READMEs, docs, declared interfaces
+#   deep     — + source-level semantic pass (slower, costs more)
+depth: standard
+
+# Minimum confidence (0–1) for an edge to appear in the findings doc.
+# Edges below this threshold are still stored in the graph for future runs.
+connection_threshold: 0.35
+
+# How willing Dirk is to suggest latent / "everything is connected" links.
+#   0.0 — only confident, evidence-backed connections
+#   1.0 — full Dirk mode (the cat is connected to the sofa is connected to
+#         quantum mechanics)
+serendipity: 0.5
+
+# Output locations.
+output:
+  graph_dir: graph
+  findings_dir: findings
+
+# Model preferences for the optional LLM-driven skills.
+# Local options keep cost at zero but require a model to be available;
+# hosted options call out and require credentials in the environment.
+model_preferences:
+  embedding: local      # local | hosted
+  curation: hosted      # local | hosted
+
+# What the workhorse skills should do on each run.
+skills:
+  repo_inventory: true
+  dependency_mapper: true
+  interface_extractor: true
+  concept_extractor: true
+  semantic_linker: true
+  connection_curator: true
+
+# Optional cost ceiling per scheduled run (USD, hosted models only).
+# Leave null to disable.
+cost_ceiling_usd: null

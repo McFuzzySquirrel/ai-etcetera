@@ -1,0 +1,9 @@
+# Dirk scope file
+#
+# Lists the repositories Dirk should consider as part of the "collection".
+# Format: owner/repo (one per line under `repos:`).
+#
+# Tip: the repository hosting Dirk itself can be included so Dirk notices
+# its own connections to the rest of the collection.
+repos:
+  - McFuzzySquirrel/ai-etcetera

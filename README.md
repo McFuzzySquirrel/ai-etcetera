@@ -134,10 +134,14 @@ serendipity: 0.5             # 0 = only confident links, 1 = full Dirk mode
 output:
   graph_dir: graph
   findings_dir: findings
-model_preferences:
-  embedding: local           # local | hosted
-  curation: hosted           # local | hosted
 ```
+
+> **Model runtime.** Dirk does not own a model. The "smart" skills
+> (Phases 3 & 4) are designed to run inside whatever agent session you
+> already use — GitHub Copilot CLI, the Copilot coding agent, etc. —
+> and write into the graph through small CLI verbs. There is no
+> hosted-model dependency, no API key, no cost-ceiling logic in this
+> repo. See [`docs/PHASES.md`](docs/PHASES.md) for the full design.
 
 `repos.yml` is the hand-maintained scope file. Each entry is either a plain
 `owner/name` slug or a mapping that also points at a local checkout — the
@@ -163,8 +167,8 @@ the loop on what Dirk has noticed.
 |---|---|
 | 1 — Skeleton + repo-inventory + SQLite + trivial findings | ✅ implemented |
 | 2 — Explicit connections (deps + interfaces) + viewer    | ✅ manifest parsing + CLI/schema extraction |
-| 3 — Latent connections (concepts + semantic linker)      | 🟡 stubs in place |
-| 4 — Synthesis (curator)                                  | 🟡 heuristic curator (LLM synthesis pending) |
+| 3 — Latent connections (concepts + semantic linker)      | 🟡 stubs in place — see [`docs/PHASES.md`](docs/PHASES.md) |
+| 4 — Synthesis (curator)                                  | 🟡 heuristic curator (LLM synthesis pending — see [`docs/PHASES.md`](docs/PHASES.md)) |
 | 5 — Periodic + delta + PR loop                           | ✅ workflow + delta implemented |
 
 ## Licence

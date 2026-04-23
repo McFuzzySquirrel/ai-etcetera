@@ -43,4 +43,22 @@ def test_load_repos_filters_garbage(tmp_path):
     p.write_text(yaml.safe_dump({"repos": ["good/one", "", "no-slash", 42, "  spaced/two  "]}),
                  encoding="utf-8")
     repos = load_repos(p)
-    assert repos == ["good/one", "spaced/two"]
+    assert [r.slug for r in repos] == ["good/one", "spaced/two"]
+    assert all(r.path is None for r in repos)
+
+
+def test_load_repos_accepts_dict_entries_with_path(tmp_path):
+    checkout = tmp_path / "checkouts" / "one"
+    checkout.mkdir(parents=True)
+    p = tmp_path / "repos.yml"
+    p.write_text(yaml.safe_dump({"repos": [
+        {"slug": "good/one", "path": "checkouts/one"},
+        {"slug": "good/two"},   # no path → still accepted
+        {"path": "no/slug"},    # missing slug → dropped
+        "good/one",             # duplicate slug → dropped
+    ]}), encoding="utf-8")
+    repos = load_repos(p)
+    slugs = [r.slug for r in repos]
+    assert slugs == ["good/one", "good/two"]
+    assert repos[0].path == checkout.resolve()
+    assert repos[1].path is None

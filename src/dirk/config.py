@@ -18,6 +18,29 @@ from typing import Any
 import yaml
 
 
+@dataclass(frozen=True)
+class RepoSource:
+    """A repository in scope, optionally with a local checkout to scan.
+
+    ``slug`` is the canonical ``owner/name`` identifier (used for node ids and
+    GitHub lookups). ``path`` — when provided — points at a local checkout
+    that file-reading skills (``dependency_mapper``, ``interface_extractor``)
+    can inspect directly. When ``path`` is ``None``, those skills will simply
+    skip the repo.
+    """
+
+    slug: str
+    path: Path | None = None
+
+    @property
+    def owner(self) -> str:
+        return self.slug.partition("/")[0]
+
+    @property
+    def name(self) -> str:
+        return self.slug.partition("/")[2]
+
+
 DEFAULT_CONFIG_PATH = "dirk.config.yml"
 DEFAULT_REPOS_PATH = "repos.yml"
 
@@ -129,22 +152,48 @@ def load_config(path: str | Path | None = None, root: str | Path | None = None) 
     return _coerce(data, root_path)
 
 
-def load_repos(path: str | Path) -> list[str]:
-    """Load the list of ``owner/repo`` strings from ``repos.yml``."""
+def load_repos(path: str | Path) -> list[RepoSource]:
+    """Load repositories from ``repos.yml``.
+
+    Supports two entry shapes:
+
+    * ``"owner/name"`` — slug only, no local checkout.
+    * ``{slug: "owner/name", path: "./checkouts/name"}`` — slug plus local path
+      that file-scanning skills can read.
+
+    Relative ``path`` values are resolved against the directory containing
+    ``repos.yml``.
+    """
     p = Path(path)
     if not p.exists():
         return []
+    base = p.parent
     with p.open("r", encoding="utf-8") as f:
         data = yaml.safe_load(f) or {}
     repos = data.get("repos") if isinstance(data, dict) else None
     if not repos:
         return []
-    cleaned: list[str] = []
+    cleaned: list[RepoSource] = []
+    seen: set[str] = set()
     for entry in repos:
-        if not isinstance(entry, str):
+        slug: str | None = None
+        local: Path | None = None
+        if isinstance(entry, str):
+            slug = entry.strip()
+        elif isinstance(entry, dict):
+            raw_slug = entry.get("slug") or entry.get("repo")
+            if isinstance(raw_slug, str):
+                slug = raw_slug.strip()
+            raw_path = entry.get("path")
+            if isinstance(raw_path, str) and raw_path.strip():
+                candidate = Path(raw_path.strip())
+                if not candidate.is_absolute():
+                    candidate = (base / candidate).resolve()
+                local = candidate
+        if not slug or "/" not in slug:
             continue
-        entry = entry.strip()
-        if not entry or "/" not in entry:
+        if slug in seen:
             continue
-        cleaned.append(entry)
+        seen.add(slug)
+        cleaned.append(RepoSource(slug=slug, path=local))
     return cleaned

@@ -143,7 +143,15 @@ skills:
 
 
 _DEFAULT_REPOS = """\
-# Repositories Dirk should consider. One `owner/name` per line.
+# Repositories Dirk should consider.
+#
+# Each entry is either a plain "owner/name" slug, or a mapping that also
+# points at a local checkout for file-scanning skills:
+#
+#   repos:
+#     - owner/repo-one                       # slug only
+#     - slug: owner/repo-two                 # slug + local checkout
+#       path: ./checkouts/repo-two           # relative to this file
 repos: []
 """
 

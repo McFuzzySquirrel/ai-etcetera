@@ -139,12 +139,16 @@ model_preferences:
   curation: hosted           # local | hosted
 ```
 
-`repos.yml` is the hand-maintained scope file:
+`repos.yml` is the hand-maintained scope file. Each entry is either a plain
+`owner/name` slug or a mapping that also points at a local checkout — the
+file-scanning skills (`dependency-mapper`, `interface-extractor`) only have
+something to read when a `path` is provided:
 
 ```yaml
 repos:
-  - owner/repo-one
-  - owner/repo-two
+  - owner/repo-one                     # slug only — appears in graph, no scan
+  - slug: owner/repo-two               # slug + local checkout
+    path: ./checkouts/repo-two         # relative to repos.yml's directory
 ```
 
 ## Periodic execution
@@ -158,9 +162,9 @@ the loop on what Dirk has noticed.
 | Phase | Status |
 |---|---|
 | 1 — Skeleton + repo-inventory + SQLite + trivial findings | ✅ implemented |
-| 2 — Explicit connections (deps + interfaces) + viewer    | 🟡 stubs in place |
+| 2 — Explicit connections (deps + interfaces) + viewer    | ✅ manifest parsing + CLI/schema extraction |
 | 3 — Latent connections (concepts + semantic linker)      | 🟡 stubs in place |
-| 4 — Synthesis (curator)                                  | 🟡 stubs in place |
+| 4 — Synthesis (curator)                                  | 🟡 heuristic curator (LLM synthesis pending) |
 | 5 — Periodic + delta + PR loop                           | ✅ workflow + delta implemented |
 
 ## Licence

@@ -229,14 +229,20 @@ class GraphStore:
 
     def to_cytoscape(self) -> dict[str, Any]:
         """Export the graph as a Cytoscape.js-compatible JSON document."""
+        # Cytoscape treats ``data.source`` / ``data.target`` as edge markers,
+        # and ``data.id`` / ``data.kind`` / ``data.label`` are structural.
+        # Strip those keys from node properties before merging so a property
+        # name collision can never corrupt the export.
+        reserved = {"id", "label", "kind", "source", "target"}
         elements: list[dict[str, Any]] = []
         for node in self.iter_nodes():
+            safe_props = {k: v for k, v in node.properties.items() if k not in reserved}
             elements.append({
                 "data": {
                     "id": node.id,
                     "label": node.name,
                     "kind": node.kind,
-                    **node.properties,
+                    **safe_props,
                 }
             })
         for edge in self.iter_edges():

@@ -14,7 +14,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Protocol
 
-from dirk.config import Config
+from dirk.config import Config, RepoSource
 from dirk.storage import GraphStore
 
 
@@ -23,7 +23,7 @@ class SkillContext:
     """Everything a skill needs to do its job."""
     config: Config
     store: GraphStore
-    repos: list[str]
+    repos: list["RepoSource"]
 
 
 @dataclass
@@ -76,6 +76,7 @@ __all__ = [
     "Skill",
     "SkillContext",
     "SkillResult",
+    "RepoSource",
     "SKILL_REGISTRY",
     "SKILL_ORDER",
 ]

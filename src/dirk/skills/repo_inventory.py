@@ -38,12 +38,15 @@ class RepoInventory:
             notes.append("offline mode: no GITHUB_TOKEN or requests not installed")
 
         with ctx.store.transaction():
-            for slug in ctx.repos:
-                owner, _, name = slug.partition("/")
+            for source in ctx.repos:
+                slug = source.slug
+                owner, name = source.owner, source.name
                 if not owner or not name:
                     continue
                 node_id = f"repo:{slug}"
                 props: dict[str, Any] = {"owner": owner, "name": name, "slug": slug}
+                if source.path is not None:
+                    props["local_path"] = str(source.path)
                 if client is not None:
                     fetched = client.fetch_repo(slug)
                     if fetched:

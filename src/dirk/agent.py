@@ -13,7 +13,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
-from dirk.config import Config, load_repos
+from dirk.config import Config, RepoSource, load_repos
 from dirk.skills import SKILL_ORDER, SKILL_REGISTRY, SkillContext, SkillResult
 from dirk.storage import GraphStore
 from dirk.writers import GraphWriter, ReportWriter
@@ -37,13 +37,12 @@ class DirkAgent:
 
     # -- scope -----------------------------------------------------------
 
-    def resolve_repos(self) -> list[str]:
-        repos: list[str] = []
+    def resolve_repos(self) -> list["RepoSource"]:
         scope_path = self.config.root / self.config.scope.source
-        repos.extend(load_repos(scope_path))
+        sources = list(load_repos(scope_path))
         # Auto-discovery from a GitHub user/org happens here in a future phase.
         # For now scope.source is authoritative.
-        return sorted(set(repos))
+        return sorted(sources, key=lambda s: s.slug)
 
     # -- run -------------------------------------------------------------
 

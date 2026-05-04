@@ -33,9 +33,9 @@ class RepoInventory:
         before_edges = ctx.store.edges_added
         notes: list[str] = []
 
-        client = _maybe_github_client()
+        client, offline_reason = _maybe_github_client()
         if client is None:
-            notes.append("offline mode: no GITHUB_TOKEN or requests not installed")
+            notes.append(f"offline mode: {offline_reason}")
 
         with ctx.store.transaction():
             for source in ctx.repos:
@@ -115,12 +115,12 @@ class _GithubClient:
             return None
 
 
-def _maybe_github_client() -> _GithubClient | None:
+def _maybe_github_client() -> tuple[_GithubClient | None, str]:
     token = os.environ.get("GITHUB_TOKEN") or os.environ.get("DIRK_GITHUB_TOKEN")
     if not token:
-        return None
+        return None, "no GITHUB_TOKEN or DIRK_GITHUB_TOKEN"
     try:
         import requests  # noqa: F401
     except ImportError:
-        return None
-    return _GithubClient(token)
+        return None, "requests not installed (install optional dependency: .[github])"
+    return _GithubClient(token), ""

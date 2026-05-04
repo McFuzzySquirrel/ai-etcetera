@@ -87,8 +87,14 @@ and produces:
 ### Install
 
 ```bash
-pip install -e .
+python3 -m venv .venv
+source .venv/bin/activate
+python3 -m pip install --upgrade pip
+python3 -m pip install -e .
 ```
+
+On Debian/Ubuntu, running `pip install -e .` outside a virtual environment may
+fail with an `externally-managed-environment` error (PEP 668).
 
 ### Initialise
 

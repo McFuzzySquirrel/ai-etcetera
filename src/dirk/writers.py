@@ -10,7 +10,6 @@
 from __future__ import annotations
 
 import json
-import shutil
 from collections import defaultdict
 from datetime import datetime, timezone
 from importlib import resources
@@ -22,7 +21,7 @@ from dirk.storage import GraphStore
 
 
 class GraphWriter:
-    """Persist the graph to JSON and copy the static viewer."""
+    """Persist the graph to JSON and render a self-contained HTML viewer."""
 
     def __init__(self, config: Config, store: GraphStore):
         self.config = config
@@ -40,7 +39,14 @@ class GraphWriter:
 
         viewer_src = resources.files("dirk.templates").joinpath("graph.html")
         with resources.as_file(viewer_src) as src_path:
-            shutil.copyfile(src_path, html_path)
+            template = src_path.read_text(encoding="utf-8")
+
+        # Escape closing tags so arbitrary text in graph data can't end the script tag.
+        embedded_graph = json.dumps(export, sort_keys=True).replace("</", "<\\/")
+        html_path.write_text(
+            template.replace("__DIRK_GRAPH_DATA__", embedded_graph, 1),
+            encoding="utf-8",
+        )
 
         return {"json": json_path, "html": html_path, "db": self.store.path}
 

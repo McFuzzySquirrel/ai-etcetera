@@ -105,6 +105,22 @@ dirk init                    # writes default dirk.config.yml + repos.yml
 
 Edit `repos.yml` to list the repositories you want Dirk to consider.
 
+### Authenticate with GitHub (optional)
+
+For richer repository metadata (languages, topics, recent activity), authenticate
+with GitHub:
+
+```bash
+dirk login                   # interactive GitHub authentication
+```
+
+This command will:
+- Use the GitHub CLI (`gh`) if already authenticated
+- Otherwise, prompt for a personal access token
+- Store the token in your session (add to shell profile to persist)
+
+If you skip this step, Dirk runs in offline mode with minimal metadata.
+
 ### Run a scan
 
 ```bash

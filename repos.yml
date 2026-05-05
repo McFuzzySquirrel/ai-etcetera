@@ -6,4 +6,29 @@
 # Tip: the repository hosting Dirk itself can be included so Dirk notices
 # its own connections to the rest of the collection.
 repos:
-  - McFuzzySquirrel/ai-etcetera
+  - slug: McFuzzySquirrel/ai-etcetera
+    path: .
+  - slug: McFuzzySquirrel/mcfuzzy-agent-forge
+    path: ../mcfuzzy-agent-forge
+  - slug: McFuzzySquirrel/viben
+    path: ../viben
+  - slug: McFuzzySquirrel/agent-forge-local
+    path: ../agent-forge-local
+  - McFuzzySquirrel/Engineering-journey-system
+  - McFuzzySquirrel/exansiedgeai-small
+  - slug: McFuzzySquirrel/photo-jumper
+    path: ../Sam/photo-jumper
+  - slug: McFuzzySquirrel/3d-space-rocks-demo
+    path: ../3d-space-rocks-demo
+  - slug: McFuzzySquirrel/mcfuzzy-test-personal-finance-app
+    path: ../mcfuzzy-test-personal-finance-app
+  - slug: McFuzzySquirrel/local-workbook-mcp
+    path: ../local-workbook-mcp
+  - McFuzzySquirrel/Voicifyit
+  - McFuzzySquirrel/re-me-pi
+  - McFuzzySquirrel/my-thoughts
+  - McFuzzySquirrel/slm-to-azure-bursting
+  - McFuzzySquirrel/on-the-road-copilot
+  - McFuzzySquirrel/azure-podcast-generator
+  - McFuzzySquirrel/podcastapp
+

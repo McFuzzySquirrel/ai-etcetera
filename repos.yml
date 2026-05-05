@@ -14,8 +14,10 @@ repos:
     path: ../viben
   - slug: McFuzzySquirrel/agent-forge-local
     path: ../agent-forge-local
-  - McFuzzySquirrel/Engineering-journey-system
-  - McFuzzySquirrel/exansiedgeai-small
+  - slug: McFuzzySquirrel/Engineering-journey-system
+    path: ../Engineering-journey-system
+  - slug: McFuzzySquirrel/exansiedgeai-small
+    path: ../exansiedgeai-small
   - slug: McFuzzySquirrel/photo-jumper
     path: ../Sam/photo-jumper
   - slug: McFuzzySquirrel/3d-space-rocks-demo
@@ -24,11 +26,12 @@ repos:
     path: ../mcfuzzy-test-personal-finance-app
   - slug: McFuzzySquirrel/local-workbook-mcp
     path: ../local-workbook-mcp
-  - McFuzzySquirrel/Voicifyit
-  - McFuzzySquirrel/re-me-pi
-  - McFuzzySquirrel/my-thoughts
-  - McFuzzySquirrel/slm-to-azure-bursting
-  - McFuzzySquirrel/on-the-road-copilot
-  - McFuzzySquirrel/azure-podcast-generator
-  - McFuzzySquirrel/podcastapp
+  - slug: McFuzzySquirrel/Voicifyit
+    path: ../Voicifyit
+  - slug: McFuzzySquirrel/re-me-pi
+    path: ../re-me-pi
+  - slug: eZansiEdgeAI/ezansi-platform-core
+    path: ../eZansiEdgeAI/ezansi-platform-core
+  - slug: ZansiEdgeAI/ezansi-blueprints
+    path: ../eZansiEdgeAI/ezansi-blueprints
 

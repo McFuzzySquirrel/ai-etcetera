@@ -36,12 +36,56 @@
     {
       "data": {
         "aliases": [
+          "Blueprint"
+        ],
+        "id": "concept:blueprint",
+        "kind": "Concept",
+        "label": "Blueprint",
+        "slug": "blueprint"
+      }
+    },
+    {
+      "data": {
+        "aliases": [
+          "Blueprints"
+        ],
+        "id": "concept:blueprints",
+        "kind": "Concept",
+        "label": "Blueprints",
+        "slug": "blueprints"
+      }
+    },
+    {
+      "data": {
+        "aliases": [
+          "Bricks"
+        ],
+        "id": "concept:bricks",
+        "kind": "Concept",
+        "label": "Bricks",
+        "slug": "bricks"
+      }
+    },
+    {
+      "data": {
+        "aliases": [
           "Calendar"
         ],
         "id": "concept:calendar",
         "kind": "Concept",
         "label": "Calendar",
         "slug": "calendar"
+      }
+    },
+    {
+      "data": {
+        "aliases": [
+          "Capability"
+        ],
+        "id": "concept:capability",
+        "kind": "Concept",
+        "label": "Capability",
+        "slug": "capability"
       }
     },
     {
@@ -75,6 +119,17 @@
         "kind": "Concept",
         "label": "Context",
         "slug": "context"
+      }
+    },
+    {
+      "data": {
+        "aliases": [
+          "Contracts"
+        ],
+        "id": "concept:contracts",
+        "kind": "Concept",
+        "label": "Contracts",
+        "slug": "contracts"
       }
     },
     {
@@ -135,6 +190,17 @@
     {
       "data": {
         "aliases": [
+          "E.g."
+        ],
+        "id": "concept:e.g.",
+        "kind": "Concept",
+        "label": "E.g.",
+        "slug": "e.g."
+      }
+    },
+    {
+      "data": {
+        "aliases": [
           "Excel"
         ],
         "id": "concept:excel",
@@ -179,6 +245,17 @@
     {
       "data": {
         "aliases": [
+          "Generative"
+        ],
+        "id": "concept:generative",
+        "kind": "Concept",
+        "label": "Generative",
+        "slug": "generative"
+      }
+    },
+    {
+      "data": {
+        "aliases": [
           "Goals"
         ],
         "id": "concept:goals",
@@ -196,6 +273,28 @@
         "kind": "Concept",
         "label": "Graph",
         "slug": "graph"
+      }
+    },
+    {
+      "data": {
+        "aliases": [
+          "Here"
+        ],
+        "id": "concept:here",
+        "kind": "Concept",
+        "label": "Here",
+        "slug": "here"
+      }
+    },
+    {
+      "data": {
+        "aliases": [
+          "Hints"
+        ],
+        "id": "concept:hints",
+        "kind": "Concept",
+        "label": "Hints",
+        "slug": "hints"
       }
     },
     {
@@ -245,6 +344,17 @@
     {
       "data": {
         "aliases": [
+          "Ideas"
+        ],
+        "id": "concept:ideas",
+        "kind": "Concept",
+        "label": "Ideas",
+        "slug": "ideas"
+      }
+    },
+    {
+      "data": {
+        "aliases": [
           "Img.shields.io"
         ],
         "id": "concept:img.shields.io",
@@ -278,6 +388,28 @@
     {
       "data": {
         "aliases": [
+          "Learning"
+        ],
+        "id": "concept:learning",
+        "kind": "Concept",
+        "label": "Learning",
+        "slug": "learning"
+      }
+    },
+    {
+      "data": {
+        "aliases": [
+          "Learning Platform"
+        ],
+        "id": "concept:learning-platform",
+        "kind": "Concept",
+        "label": "Learning Platform",
+        "slug": "learning-platform"
+      }
+    },
+    {
+      "data": {
+        "aliases": [
           "Management"
         ],
         "id": "concept:management",
@@ -295,6 +427,17 @@
         "kind": "Concept",
         "label": "Moon",
         "slug": "moon"
+      }
+    },
+    {
+      "data": {
+        "aliases": [
+          "Must"
+        ],
+        "id": "concept:must",
+        "kind": "Concept",
+        "label": "Must",
+        "slug": "must"
       }
     },
     {
@@ -394,6 +537,28 @@
         "kind": "Concept",
         "label": "Platform",
         "slug": "platform"
+      }
+    },
+    {
+      "data": {
+        "aliases": [
+          "Platform Core"
+        ],
+        "id": "concept:platform-core",
+        "kind": "Concept",
+        "label": "Platform Core",
+        "slug": "platform-core"
+      }
+    },
+    {
+      "data": {
+        "aliases": [
+          "Projects"
+        ],
+        "id": "concept:projects",
+        "kind": "Concept",
+        "label": "Projects",
+        "slug": "projects"
       }
     },
     {
@@ -520,6 +685,17 @@
     {
       "data": {
         "aliases": [
+          "Start"
+        ],
+        "id": "concept:start",
+        "kind": "Concept",
+        "label": "Start",
+        "slug": "start"
+      }
+    },
+    {
+      "data": {
+        "aliases": [
           "State"
         ],
         "id": "concept:state",
@@ -575,6 +751,28 @@
     {
       "data": {
         "aliases": [
+          "Them"
+        ],
+        "id": "concept:them",
+        "kind": "Concept",
+        "label": "Them",
+        "slug": "them"
+      }
+    },
+    {
+      "data": {
+        "aliases": [
+          "They"
+        ],
+        "id": "concept:they",
+        "kind": "Concept",
+        "label": "They",
+        "slug": "they"
+      }
+    },
+    {
+      "data": {
+        "aliases": [
           "What"
         ],
         "id": "concept:what",
@@ -614,6 +812,20 @@
     },
     {
       "data": {
+        "id": "person:ZansiEdgeAI",
+        "kind": "Person",
+        "label": "ZansiEdgeAI"
+      }
+    },
+    {
+      "data": {
+        "id": "person:eZansiEdgeAI",
+        "kind": "Person",
+        "label": "eZansiEdgeAI"
+      }
+    },
+    {
+      "data": {
         "archived": false,
         "default_branch": "main",
         "description": "For demo purposes",
@@ -643,6 +855,7 @@
         "label": "McFuzzySquirrel/Engineering-journey-system",
         "language": "Python",
         "license": "MIT",
+        "local_path": "/home/mcfuzzysquirrel/Projects/Engineering-journey-system",
         "name": "Engineering-journey-system",
         "owner": "McFuzzySquirrel",
         "private": false,
@@ -662,6 +875,7 @@
         "label": "McFuzzySquirrel/Voicifyit",
         "language": "Python",
         "license": "MIT",
+        "local_path": "/home/mcfuzzysquirrel/Projects/Voicifyit",
         "name": "Voicifyit",
         "owner": "McFuzzySquirrel",
         "private": false,
@@ -699,34 +913,25 @@
         "id": "repo:McFuzzySquirrel/ai-etcetera",
         "kind": "Repo",
         "label": "McFuzzySquirrel/ai-etcetera",
-        "language": "Python",
+        "language": "HTML",
         "license": "MIT",
         "local_path": "/home/mcfuzzysquirrel/Projects/ai-etcetera",
         "name": "ai-etcetera",
         "owner": "McFuzzySquirrel",
         "private": false,
-        "pushed_at": "2026-05-05T18:37:11Z",
+        "pushed_at": "2026-05-05T18:59:10Z",
         "slug": "McFuzzySquirrel/ai-etcetera",
         "topics": []
       }
     },
     {
       "data": {
-        "archived": false,
-        "default_branch": "main",
-        "description": "Generate an engaging podcast based on your document using Azure OpenAI and Azure Speech.",
-        "html_url": "https://github.com/McFuzzySquirrel/azure-podcast-generator",
         "id": "repo:McFuzzySquirrel/azure-podcast-generator",
         "kind": "Repo",
         "label": "McFuzzySquirrel/azure-podcast-generator",
-        "language": null,
-        "license": "MIT",
         "name": "azure-podcast-generator",
         "owner": "McFuzzySquirrel",
-        "private": false,
-        "pushed_at": "2024-10-31T08:08:42Z",
-        "slug": "McFuzzySquirrel/azure-podcast-generator",
-        "topics": []
+        "slug": "McFuzzySquirrel/azure-podcast-generator"
       }
     },
     {
@@ -734,6 +939,7 @@
         "id": "repo:McFuzzySquirrel/exansiedgeai-small",
         "kind": "Repo",
         "label": "McFuzzySquirrel/exansiedgeai-small",
+        "local_path": "/home/mcfuzzysquirrel/Projects/exansiedgeai-small",
         "name": "exansiedgeai-small",
         "owner": "McFuzzySquirrel",
         "slug": "McFuzzySquirrel/exansiedgeai-small"
@@ -887,6 +1093,7 @@
         "label": "McFuzzySquirrel/re-me-pi",
         "language": "Python",
         "license": null,
+        "local_path": "/home/mcfuzzysquirrel/Projects/re-me-pi",
         "name": "re-me-pi",
         "owner": "McFuzzySquirrel",
         "private": true,
@@ -908,7 +1115,7 @@
         "license": "MIT",
         "name": "slm-to-azure-bursting",
         "owner": "McFuzzySquirrel",
-        "private": true,
+        "private": false,
         "pushed_at": "2025-05-06T22:27:43Z",
         "slug": "McFuzzySquirrel/slm-to-azure-bursting",
         "topics": []
@@ -931,6 +1138,37 @@
         "private": false,
         "pushed_at": "2026-04-20T07:05:09Z",
         "slug": "McFuzzySquirrel/viben",
+        "topics": []
+      }
+    },
+    {
+      "data": {
+        "id": "repo:ZansiEdgeAI/ezansi-blueprints",
+        "kind": "Repo",
+        "label": "ZansiEdgeAI/ezansi-blueprints",
+        "local_path": "/home/mcfuzzysquirrel/Projects/eZansiEdgeAI/ezansi-blueprints",
+        "name": "ezansi-blueprints",
+        "owner": "ZansiEdgeAI",
+        "slug": "ZansiEdgeAI/ezansi-blueprints"
+      }
+    },
+    {
+      "data": {
+        "archived": false,
+        "default_branch": "main",
+        "description": null,
+        "html_url": "https://github.com/eZansiEdgeAI/ezansi-platform-core",
+        "id": "repo:eZansiEdgeAI/ezansi-platform-core",
+        "kind": "Repo",
+        "label": "eZansiEdgeAI/ezansi-platform-core",
+        "language": "Python",
+        "license": "MIT",
+        "local_path": "/home/mcfuzzysquirrel/Projects/eZansiEdgeAI/ezansi-platform-core",
+        "name": "ezansi-platform-core",
+        "owner": "eZansiEdgeAI",
+        "private": false,
+        "pushed_at": "2026-02-02T22:38:14Z",
+        "slug": "eZansiEdgeAI/ezansi-platform-core",
         "topics": []
       }
     },
@@ -1180,6 +1418,14 @@
         "id": "tech:npm:cannon-es",
         "kind": "Technology",
         "label": "cannon-es"
+      }
+    },
+    {
+      "data": {
+        "ecosystem": "npm",
+        "id": "tech:npm:cytoscape",
+        "kind": "Technology",
+        "label": "cytoscape"
       }
     },
     {
@@ -1441,6 +1687,102 @@
     {
       "data": {
         "ecosystem": "pypi",
+        "id": "tech:pypi:faiss-cpu",
+        "kind": "Technology",
+        "label": "faiss-cpu"
+      }
+    },
+    {
+      "data": {
+        "ecosystem": "pypi",
+        "id": "tech:pypi:fastapi",
+        "kind": "Technology",
+        "label": "fastapi"
+      }
+    },
+    {
+      "data": {
+        "ecosystem": "pypi",
+        "id": "tech:pypi:flask",
+        "kind": "Technology",
+        "label": "flask"
+      }
+    },
+    {
+      "data": {
+        "ecosystem": "pypi",
+        "id": "tech:pypi:flask-cors",
+        "kind": "Technology",
+        "label": "flask-cors"
+      }
+    },
+    {
+      "data": {
+        "ecosystem": "pypi",
+        "id": "tech:pypi:httpx",
+        "kind": "Technology",
+        "label": "httpx"
+      }
+    },
+    {
+      "data": {
+        "ecosystem": "pypi",
+        "id": "tech:pypi:markdownify",
+        "kind": "Technology",
+        "label": "markdownify"
+      }
+    },
+    {
+      "data": {
+        "ecosystem": "pypi",
+        "id": "tech:pypi:markitdown",
+        "kind": "Technology",
+        "label": "markitdown"
+      }
+    },
+    {
+      "data": {
+        "ecosystem": "pypi",
+        "id": "tech:pypi:numpy",
+        "kind": "Technology",
+        "label": "numpy"
+      }
+    },
+    {
+      "data": {
+        "ecosystem": "pypi",
+        "id": "tech:pypi:pandas",
+        "kind": "Technology",
+        "label": "pandas"
+      }
+    },
+    {
+      "data": {
+        "ecosystem": "pypi",
+        "id": "tech:pypi:psutil",
+        "kind": "Technology",
+        "label": "psutil"
+      }
+    },
+    {
+      "data": {
+        "ecosystem": "pypi",
+        "id": "tech:pypi:psycopg2-binary",
+        "kind": "Technology",
+        "label": "psycopg2-binary"
+      }
+    },
+    {
+      "data": {
+        "ecosystem": "pypi",
+        "id": "tech:pypi:pydantic",
+        "kind": "Technology",
+        "label": "pydantic"
+      }
+    },
+    {
+      "data": {
+        "ecosystem": "pypi",
         "id": "tech:pypi:pytest",
         "kind": "Technology",
         "label": "pytest"
@@ -1449,9 +1791,25 @@
     {
       "data": {
         "ecosystem": "pypi",
+        "id": "tech:pypi:pytest-asyncio",
+        "kind": "Technology",
+        "label": "pytest-asyncio"
+      }
+    },
+    {
+      "data": {
+        "ecosystem": "pypi",
         "id": "tech:pypi:pytest-cov",
         "kind": "Technology",
         "label": "pytest-cov"
+      }
+    },
+    {
+      "data": {
+        "ecosystem": "pypi",
+        "id": "tech:pypi:python-dotenv",
+        "kind": "Technology",
+        "label": "python-dotenv"
       }
     },
     {
@@ -1468,6 +1826,46 @@
         "id": "tech:pypi:requests",
         "kind": "Technology",
         "label": "requests"
+      }
+    },
+    {
+      "data": {
+        "ecosystem": "pypi",
+        "id": "tech:pypi:sentence-transformers",
+        "kind": "Technology",
+        "label": "sentence-transformers"
+      }
+    },
+    {
+      "data": {
+        "ecosystem": "pypi",
+        "id": "tech:pypi:sqlalchemy",
+        "kind": "Technology",
+        "label": "sqlalchemy"
+      }
+    },
+    {
+      "data": {
+        "ecosystem": "pypi",
+        "id": "tech:pypi:sqlite3",
+        "kind": "Technology",
+        "label": "sqlite3"
+      }
+    },
+    {
+      "data": {
+        "ecosystem": "pypi",
+        "id": "tech:pypi:tqdm",
+        "kind": "Technology",
+        "label": "tqdm"
+      }
+    },
+    {
+      "data": {
+        "ecosystem": "pypi",
+        "id": "tech:pypi:uvicorn",
+        "kind": "Technology",
+        "label": "uvicorn"
       }
     },
     {
@@ -1642,12 +2040,42 @@
     },
     {
       "data": {
+        "confidence": 1.0,
+        "discovered_by": "repo_inventory",
+        "id": "repo:ZansiEdgeAI/ezansi-blueprints->person:ZansiEdgeAI:AUTHORED_BY",
+        "kind": "AUTHORED_BY",
+        "source": "repo:ZansiEdgeAI/ezansi-blueprints",
+        "target": "person:ZansiEdgeAI"
+      }
+    },
+    {
+      "data": {
+        "confidence": 1.0,
+        "discovered_by": "repo_inventory",
+        "id": "repo:eZansiEdgeAI/ezansi-platform-core->person:eZansiEdgeAI:AUTHORED_BY",
+        "kind": "AUTHORED_BY",
+        "source": "repo:eZansiEdgeAI/ezansi-platform-core",
+        "target": "person:eZansiEdgeAI"
+      }
+    },
+    {
+      "data": {
         "confidence": 0.6,
         "discovered_by": "connection_curator",
         "id": "repo:McFuzzySquirrel/3d-space-rocks-demo->repo:McFuzzySquirrel/agent-forge-local:COULD_COMPOSE_WITH",
         "kind": "COULD_COMPOSE_WITH",
         "source": "repo:McFuzzySquirrel/3d-space-rocks-demo",
         "target": "repo:McFuzzySquirrel/agent-forge-local"
+      }
+    },
+    {
+      "data": {
+        "confidence": 0.6,
+        "discovered_by": "connection_curator",
+        "id": "repo:McFuzzySquirrel/3d-space-rocks-demo->repo:McFuzzySquirrel/ai-etcetera:COULD_COMPOSE_WITH",
+        "kind": "COULD_COMPOSE_WITH",
+        "source": "repo:McFuzzySquirrel/3d-space-rocks-demo",
+        "target": "repo:McFuzzySquirrel/ai-etcetera"
       }
     },
     {
@@ -1668,6 +2096,16 @@
         "kind": "COULD_COMPOSE_WITH",
         "source": "repo:McFuzzySquirrel/3d-space-rocks-demo",
         "target": "repo:McFuzzySquirrel/viben"
+      }
+    },
+    {
+      "data": {
+        "confidence": 0.8500000000000001,
+        "discovered_by": "connection_curator",
+        "id": "repo:McFuzzySquirrel/agent-forge-local->repo:McFuzzySquirrel/ai-etcetera:COULD_COMPOSE_WITH",
+        "kind": "COULD_COMPOSE_WITH",
+        "source": "repo:McFuzzySquirrel/agent-forge-local",
+        "target": "repo:McFuzzySquirrel/ai-etcetera"
       }
     },
     {
@@ -1718,6 +2156,46 @@
         "kind": "COULD_COMPOSE_WITH",
         "source": "repo:McFuzzySquirrel/agent-forge-local",
         "target": "repo:McFuzzySquirrel/viben"
+      }
+    },
+    {
+      "data": {
+        "confidence": 0.65,
+        "discovered_by": "connection_curator",
+        "id": "repo:McFuzzySquirrel/ai-etcetera->repo:McFuzzySquirrel/mcfuzzy-test-personal-finance-app:COULD_COMPOSE_WITH",
+        "kind": "COULD_COMPOSE_WITH",
+        "source": "repo:McFuzzySquirrel/ai-etcetera",
+        "target": "repo:McFuzzySquirrel/mcfuzzy-test-personal-finance-app"
+      }
+    },
+    {
+      "data": {
+        "confidence": 0.6,
+        "discovered_by": "connection_curator",
+        "id": "repo:McFuzzySquirrel/ai-etcetera->repo:McFuzzySquirrel/re-me-pi:COULD_COMPOSE_WITH",
+        "kind": "COULD_COMPOSE_WITH",
+        "source": "repo:McFuzzySquirrel/ai-etcetera",
+        "target": "repo:McFuzzySquirrel/re-me-pi"
+      }
+    },
+    {
+      "data": {
+        "confidence": 0.8500000000000001,
+        "discovered_by": "connection_curator",
+        "id": "repo:McFuzzySquirrel/ai-etcetera->repo:McFuzzySquirrel/viben:COULD_COMPOSE_WITH",
+        "kind": "COULD_COMPOSE_WITH",
+        "source": "repo:McFuzzySquirrel/ai-etcetera",
+        "target": "repo:McFuzzySquirrel/viben"
+      }
+    },
+    {
+      "data": {
+        "confidence": 0.55,
+        "discovered_by": "connection_curator",
+        "id": "repo:McFuzzySquirrel/ai-etcetera->repo:eZansiEdgeAI/ezansi-platform-core:COULD_COMPOSE_WITH",
+        "kind": "COULD_COMPOSE_WITH",
+        "source": "repo:McFuzzySquirrel/ai-etcetera",
+        "target": "repo:eZansiEdgeAI/ezansi-platform-core"
       }
     },
     {
@@ -1978,6 +2456,86 @@
         "kind": "DEPENDS_ON",
         "source": "repo:McFuzzySquirrel/agent-forge-local",
         "target": "tech:npm:vitest"
+      }
+    },
+    {
+      "data": {
+        "confidence": 0.9,
+        "discovered_by": "dependency_mapper",
+        "id": "repo:McFuzzySquirrel/ai-etcetera->tech:npm:@types/react:DEPENDS_ON",
+        "kind": "DEPENDS_ON",
+        "source": "repo:McFuzzySquirrel/ai-etcetera",
+        "target": "tech:npm:@types/react"
+      }
+    },
+    {
+      "data": {
+        "confidence": 0.9,
+        "discovered_by": "dependency_mapper",
+        "id": "repo:McFuzzySquirrel/ai-etcetera->tech:npm:@types/react-dom:DEPENDS_ON",
+        "kind": "DEPENDS_ON",
+        "source": "repo:McFuzzySquirrel/ai-etcetera",
+        "target": "tech:npm:@types/react-dom"
+      }
+    },
+    {
+      "data": {
+        "confidence": 0.9,
+        "discovered_by": "dependency_mapper",
+        "id": "repo:McFuzzySquirrel/ai-etcetera->tech:npm:@vitejs/plugin-react:DEPENDS_ON",
+        "kind": "DEPENDS_ON",
+        "source": "repo:McFuzzySquirrel/ai-etcetera",
+        "target": "tech:npm:@vitejs/plugin-react"
+      }
+    },
+    {
+      "data": {
+        "confidence": 0.9,
+        "discovered_by": "dependency_mapper",
+        "id": "repo:McFuzzySquirrel/ai-etcetera->tech:npm:cytoscape:DEPENDS_ON",
+        "kind": "DEPENDS_ON",
+        "source": "repo:McFuzzySquirrel/ai-etcetera",
+        "target": "tech:npm:cytoscape"
+      }
+    },
+    {
+      "data": {
+        "confidence": 0.9,
+        "discovered_by": "dependency_mapper",
+        "id": "repo:McFuzzySquirrel/ai-etcetera->tech:npm:react:DEPENDS_ON",
+        "kind": "DEPENDS_ON",
+        "source": "repo:McFuzzySquirrel/ai-etcetera",
+        "target": "tech:npm:react"
+      }
+    },
+    {
+      "data": {
+        "confidence": 0.9,
+        "discovered_by": "dependency_mapper",
+        "id": "repo:McFuzzySquirrel/ai-etcetera->tech:npm:react-dom:DEPENDS_ON",
+        "kind": "DEPENDS_ON",
+        "source": "repo:McFuzzySquirrel/ai-etcetera",
+        "target": "tech:npm:react-dom"
+      }
+    },
+    {
+      "data": {
+        "confidence": 0.9,
+        "discovered_by": "dependency_mapper",
+        "id": "repo:McFuzzySquirrel/ai-etcetera->tech:npm:typescript:DEPENDS_ON",
+        "kind": "DEPENDS_ON",
+        "source": "repo:McFuzzySquirrel/ai-etcetera",
+        "target": "tech:npm:typescript"
+      }
+    },
+    {
+      "data": {
+        "confidence": 0.9,
+        "discovered_by": "dependency_mapper",
+        "id": "repo:McFuzzySquirrel/ai-etcetera->tech:npm:vite:DEPENDS_ON",
+        "kind": "DEPENDS_ON",
+        "source": "repo:McFuzzySquirrel/ai-etcetera",
+        "target": "tech:npm:vite"
       }
     },
     {
@@ -2484,6 +3042,166 @@
       "data": {
         "confidence": 0.9,
         "discovered_by": "dependency_mapper",
+        "id": "repo:McFuzzySquirrel/re-me-pi->tech:pypi:faiss-cpu:DEPENDS_ON",
+        "kind": "DEPENDS_ON",
+        "source": "repo:McFuzzySquirrel/re-me-pi",
+        "target": "tech:pypi:faiss-cpu"
+      }
+    },
+    {
+      "data": {
+        "confidence": 0.9,
+        "discovered_by": "dependency_mapper",
+        "id": "repo:McFuzzySquirrel/re-me-pi->tech:pypi:flask:DEPENDS_ON",
+        "kind": "DEPENDS_ON",
+        "source": "repo:McFuzzySquirrel/re-me-pi",
+        "target": "tech:pypi:flask"
+      }
+    },
+    {
+      "data": {
+        "confidence": 0.9,
+        "discovered_by": "dependency_mapper",
+        "id": "repo:McFuzzySquirrel/re-me-pi->tech:pypi:flask-cors:DEPENDS_ON",
+        "kind": "DEPENDS_ON",
+        "source": "repo:McFuzzySquirrel/re-me-pi",
+        "target": "tech:pypi:flask-cors"
+      }
+    },
+    {
+      "data": {
+        "confidence": 0.9,
+        "discovered_by": "dependency_mapper",
+        "id": "repo:McFuzzySquirrel/re-me-pi->tech:pypi:markdownify:DEPENDS_ON",
+        "kind": "DEPENDS_ON",
+        "source": "repo:McFuzzySquirrel/re-me-pi",
+        "target": "tech:pypi:markdownify"
+      }
+    },
+    {
+      "data": {
+        "confidence": 0.9,
+        "discovered_by": "dependency_mapper",
+        "id": "repo:McFuzzySquirrel/re-me-pi->tech:pypi:markitdown:DEPENDS_ON",
+        "kind": "DEPENDS_ON",
+        "source": "repo:McFuzzySquirrel/re-me-pi",
+        "target": "tech:pypi:markitdown"
+      }
+    },
+    {
+      "data": {
+        "confidence": 0.9,
+        "discovered_by": "dependency_mapper",
+        "id": "repo:McFuzzySquirrel/re-me-pi->tech:pypi:numpy:DEPENDS_ON",
+        "kind": "DEPENDS_ON",
+        "source": "repo:McFuzzySquirrel/re-me-pi",
+        "target": "tech:pypi:numpy"
+      }
+    },
+    {
+      "data": {
+        "confidence": 0.9,
+        "discovered_by": "dependency_mapper",
+        "id": "repo:McFuzzySquirrel/re-me-pi->tech:pypi:pandas:DEPENDS_ON",
+        "kind": "DEPENDS_ON",
+        "source": "repo:McFuzzySquirrel/re-me-pi",
+        "target": "tech:pypi:pandas"
+      }
+    },
+    {
+      "data": {
+        "confidence": 0.9,
+        "discovered_by": "dependency_mapper",
+        "id": "repo:McFuzzySquirrel/re-me-pi->tech:pypi:psutil:DEPENDS_ON",
+        "kind": "DEPENDS_ON",
+        "source": "repo:McFuzzySquirrel/re-me-pi",
+        "target": "tech:pypi:psutil"
+      }
+    },
+    {
+      "data": {
+        "confidence": 0.9,
+        "discovered_by": "dependency_mapper",
+        "id": "repo:McFuzzySquirrel/re-me-pi->tech:pypi:psycopg2-binary:DEPENDS_ON",
+        "kind": "DEPENDS_ON",
+        "source": "repo:McFuzzySquirrel/re-me-pi",
+        "target": "tech:pypi:psycopg2-binary"
+      }
+    },
+    {
+      "data": {
+        "confidence": 0.9,
+        "discovered_by": "dependency_mapper",
+        "id": "repo:McFuzzySquirrel/re-me-pi->tech:pypi:pytest:DEPENDS_ON",
+        "kind": "DEPENDS_ON",
+        "source": "repo:McFuzzySquirrel/re-me-pi",
+        "target": "tech:pypi:pytest"
+      }
+    },
+    {
+      "data": {
+        "confidence": 0.9,
+        "discovered_by": "dependency_mapper",
+        "id": "repo:McFuzzySquirrel/re-me-pi->tech:pypi:python-dotenv:DEPENDS_ON",
+        "kind": "DEPENDS_ON",
+        "source": "repo:McFuzzySquirrel/re-me-pi",
+        "target": "tech:pypi:python-dotenv"
+      }
+    },
+    {
+      "data": {
+        "confidence": 0.9,
+        "discovered_by": "dependency_mapper",
+        "id": "repo:McFuzzySquirrel/re-me-pi->tech:pypi:requests:DEPENDS_ON",
+        "kind": "DEPENDS_ON",
+        "source": "repo:McFuzzySquirrel/re-me-pi",
+        "target": "tech:pypi:requests"
+      }
+    },
+    {
+      "data": {
+        "confidence": 0.9,
+        "discovered_by": "dependency_mapper",
+        "id": "repo:McFuzzySquirrel/re-me-pi->tech:pypi:sentence-transformers:DEPENDS_ON",
+        "kind": "DEPENDS_ON",
+        "source": "repo:McFuzzySquirrel/re-me-pi",
+        "target": "tech:pypi:sentence-transformers"
+      }
+    },
+    {
+      "data": {
+        "confidence": 0.9,
+        "discovered_by": "dependency_mapper",
+        "id": "repo:McFuzzySquirrel/re-me-pi->tech:pypi:sqlalchemy:DEPENDS_ON",
+        "kind": "DEPENDS_ON",
+        "source": "repo:McFuzzySquirrel/re-me-pi",
+        "target": "tech:pypi:sqlalchemy"
+      }
+    },
+    {
+      "data": {
+        "confidence": 0.9,
+        "discovered_by": "dependency_mapper",
+        "id": "repo:McFuzzySquirrel/re-me-pi->tech:pypi:sqlite3:DEPENDS_ON",
+        "kind": "DEPENDS_ON",
+        "source": "repo:McFuzzySquirrel/re-me-pi",
+        "target": "tech:pypi:sqlite3"
+      }
+    },
+    {
+      "data": {
+        "confidence": 0.9,
+        "discovered_by": "dependency_mapper",
+        "id": "repo:McFuzzySquirrel/re-me-pi->tech:pypi:tqdm:DEPENDS_ON",
+        "kind": "DEPENDS_ON",
+        "source": "repo:McFuzzySquirrel/re-me-pi",
+        "target": "tech:pypi:tqdm"
+      }
+    },
+    {
+      "data": {
+        "confidence": 0.9,
+        "discovered_by": "dependency_mapper",
         "id": "repo:McFuzzySquirrel/viben->tech:npm:@playwright/test:DEPENDS_ON",
         "kind": "DEPENDS_ON",
         "source": "repo:McFuzzySquirrel/viben",
@@ -2628,6 +3346,86 @@
         "kind": "DEPENDS_ON",
         "source": "repo:McFuzzySquirrel/viben",
         "target": "tech:npm:vitest"
+      }
+    },
+    {
+      "data": {
+        "confidence": 0.9,
+        "discovered_by": "dependency_mapper",
+        "id": "repo:eZansiEdgeAI/ezansi-platform-core->tech:pypi:fastapi:DEPENDS_ON",
+        "kind": "DEPENDS_ON",
+        "source": "repo:eZansiEdgeAI/ezansi-platform-core",
+        "target": "tech:pypi:fastapi"
+      }
+    },
+    {
+      "data": {
+        "confidence": 0.9,
+        "discovered_by": "dependency_mapper",
+        "id": "repo:eZansiEdgeAI/ezansi-platform-core->tech:pypi:httpx:DEPENDS_ON",
+        "kind": "DEPENDS_ON",
+        "source": "repo:eZansiEdgeAI/ezansi-platform-core",
+        "target": "tech:pypi:httpx"
+      }
+    },
+    {
+      "data": {
+        "confidence": 0.9,
+        "discovered_by": "dependency_mapper",
+        "id": "repo:eZansiEdgeAI/ezansi-platform-core->tech:pypi:pydantic:DEPENDS_ON",
+        "kind": "DEPENDS_ON",
+        "source": "repo:eZansiEdgeAI/ezansi-platform-core",
+        "target": "tech:pypi:pydantic"
+      }
+    },
+    {
+      "data": {
+        "confidence": 0.9,
+        "discovered_by": "dependency_mapper",
+        "id": "repo:eZansiEdgeAI/ezansi-platform-core->tech:pypi:pytest:DEPENDS_ON",
+        "kind": "DEPENDS_ON",
+        "source": "repo:eZansiEdgeAI/ezansi-platform-core",
+        "target": "tech:pypi:pytest"
+      }
+    },
+    {
+      "data": {
+        "confidence": 0.9,
+        "discovered_by": "dependency_mapper",
+        "id": "repo:eZansiEdgeAI/ezansi-platform-core->tech:pypi:pytest-asyncio:DEPENDS_ON",
+        "kind": "DEPENDS_ON",
+        "source": "repo:eZansiEdgeAI/ezansi-platform-core",
+        "target": "tech:pypi:pytest-asyncio"
+      }
+    },
+    {
+      "data": {
+        "confidence": 0.9,
+        "discovered_by": "dependency_mapper",
+        "id": "repo:eZansiEdgeAI/ezansi-platform-core->tech:pypi:pytest-cov:DEPENDS_ON",
+        "kind": "DEPENDS_ON",
+        "source": "repo:eZansiEdgeAI/ezansi-platform-core",
+        "target": "tech:pypi:pytest-cov"
+      }
+    },
+    {
+      "data": {
+        "confidence": 0.9,
+        "discovered_by": "dependency_mapper",
+        "id": "repo:eZansiEdgeAI/ezansi-platform-core->tech:pypi:pyyaml:DEPENDS_ON",
+        "kind": "DEPENDS_ON",
+        "source": "repo:eZansiEdgeAI/ezansi-platform-core",
+        "target": "tech:pypi:pyyaml"
+      }
+    },
+    {
+      "data": {
+        "confidence": 0.9,
+        "discovered_by": "dependency_mapper",
+        "id": "repo:eZansiEdgeAI/ezansi-platform-core->tech:pypi:uvicorn:DEPENDS_ON",
+        "kind": "DEPENDS_ON",
+        "source": "repo:eZansiEdgeAI/ezansi-platform-core",
+        "target": "tech:pypi:uvicorn"
       }
     },
     {
@@ -4502,6 +5300,86 @@
     },
     {
       "data": {
+        "confidence": 0.7916666666666666,
+        "discovered_by": "concept_extractor",
+        "id": "repo:McFuzzySquirrel/re-me-pi->concept:generative:MENTIONS",
+        "kind": "MENTIONS",
+        "source": "repo:McFuzzySquirrel/re-me-pi",
+        "target": "concept:generative"
+      }
+    },
+    {
+      "data": {
+        "confidence": 0.7916666666666666,
+        "discovered_by": "concept_extractor",
+        "id": "repo:McFuzzySquirrel/re-me-pi->concept:here:MENTIONS",
+        "kind": "MENTIONS",
+        "source": "repo:McFuzzySquirrel/re-me-pi",
+        "target": "concept:here"
+      }
+    },
+    {
+      "data": {
+        "confidence": 0.7916666666666666,
+        "discovered_by": "concept_extractor",
+        "id": "repo:McFuzzySquirrel/re-me-pi->concept:ideas:MENTIONS",
+        "kind": "MENTIONS",
+        "source": "repo:McFuzzySquirrel/re-me-pi",
+        "target": "concept:ideas"
+      }
+    },
+    {
+      "data": {
+        "confidence": 0.95,
+        "discovered_by": "concept_extractor",
+        "id": "repo:McFuzzySquirrel/re-me-pi->concept:learning:MENTIONS",
+        "kind": "MENTIONS",
+        "source": "repo:McFuzzySquirrel/re-me-pi",
+        "target": "concept:learning"
+      }
+    },
+    {
+      "data": {
+        "confidence": 0.7916666666666666,
+        "discovered_by": "concept_extractor",
+        "id": "repo:McFuzzySquirrel/re-me-pi->concept:learning-platform:MENTIONS",
+        "kind": "MENTIONS",
+        "source": "repo:McFuzzySquirrel/re-me-pi",
+        "target": "concept:learning-platform"
+      }
+    },
+    {
+      "data": {
+        "confidence": 0.9416666666666667,
+        "discovered_by": "concept_extractor",
+        "id": "repo:McFuzzySquirrel/re-me-pi->concept:projects:MENTIONS",
+        "kind": "MENTIONS",
+        "source": "repo:McFuzzySquirrel/re-me-pi",
+        "target": "concept:projects"
+      }
+    },
+    {
+      "data": {
+        "confidence": 0.9416666666666667,
+        "discovered_by": "concept_extractor",
+        "id": "repo:McFuzzySquirrel/re-me-pi->concept:them:MENTIONS",
+        "kind": "MENTIONS",
+        "source": "repo:McFuzzySquirrel/re-me-pi",
+        "target": "concept:them"
+      }
+    },
+    {
+      "data": {
+        "confidence": 0.9416666666666667,
+        "discovered_by": "concept_extractor",
+        "id": "repo:McFuzzySquirrel/re-me-pi->concept:they:MENTIONS",
+        "kind": "MENTIONS",
+        "source": "repo:McFuzzySquirrel/re-me-pi",
+        "target": "concept:they"
+      }
+    },
+    {
+      "data": {
         "confidence": 0.2,
         "discovered_by": "dependency_mapper",
         "id": "repo:McFuzzySquirrel/re-me-pi->repo:McFuzzySquirrel/slm-to-azure-bursting:MENTIONS",
@@ -4612,6 +5490,166 @@
     },
     {
       "data": {
+        "confidence": 0.9416666666666667,
+        "discovered_by": "concept_extractor",
+        "id": "repo:ZansiEdgeAI/ezansi-blueprints->concept:blueprint:MENTIONS",
+        "kind": "MENTIONS",
+        "source": "repo:ZansiEdgeAI/ezansi-blueprints",
+        "target": "concept:blueprint"
+      }
+    },
+    {
+      "data": {
+        "confidence": 0.95,
+        "discovered_by": "concept_extractor",
+        "id": "repo:ZansiEdgeAI/ezansi-blueprints->concept:blueprints:MENTIONS",
+        "kind": "MENTIONS",
+        "source": "repo:ZansiEdgeAI/ezansi-blueprints",
+        "target": "concept:blueprints"
+      }
+    },
+    {
+      "data": {
+        "confidence": 0.95,
+        "discovered_by": "concept_extractor",
+        "id": "repo:ZansiEdgeAI/ezansi-blueprints->concept:capability:MENTIONS",
+        "kind": "MENTIONS",
+        "source": "repo:ZansiEdgeAI/ezansi-blueprints",
+        "target": "concept:capability"
+      }
+    },
+    {
+      "data": {
+        "confidence": 0.95,
+        "discovered_by": "concept_extractor",
+        "id": "repo:ZansiEdgeAI/ezansi-blueprints->concept:e.g.:MENTIONS",
+        "kind": "MENTIONS",
+        "source": "repo:ZansiEdgeAI/ezansi-blueprints",
+        "target": "concept:e.g."
+      }
+    },
+    {
+      "data": {
+        "confidence": 0.9416666666666667,
+        "discovered_by": "concept_extractor",
+        "id": "repo:ZansiEdgeAI/ezansi-blueprints->concept:hints:MENTIONS",
+        "kind": "MENTIONS",
+        "source": "repo:ZansiEdgeAI/ezansi-blueprints",
+        "target": "concept:hints"
+      }
+    },
+    {
+      "data": {
+        "confidence": 0.9416666666666667,
+        "discovered_by": "concept_extractor",
+        "id": "repo:ZansiEdgeAI/ezansi-blueprints->concept:must:MENTIONS",
+        "kind": "MENTIONS",
+        "source": "repo:ZansiEdgeAI/ezansi-blueprints",
+        "target": "concept:must"
+      }
+    },
+    {
+      "data": {
+        "confidence": 0.9416666666666667,
+        "discovered_by": "concept_extractor",
+        "id": "repo:ZansiEdgeAI/ezansi-blueprints->concept:platform-core:MENTIONS",
+        "kind": "MENTIONS",
+        "source": "repo:ZansiEdgeAI/ezansi-blueprints",
+        "target": "concept:platform-core"
+      }
+    },
+    {
+      "data": {
+        "confidence": 0.95,
+        "discovered_by": "concept_extractor",
+        "id": "repo:ZansiEdgeAI/ezansi-blueprints->concept:stack:MENTIONS",
+        "kind": "MENTIONS",
+        "source": "repo:ZansiEdgeAI/ezansi-blueprints",
+        "target": "concept:stack"
+      }
+    },
+    {
+      "data": {
+        "confidence": 0.95,
+        "discovered_by": "concept_extractor",
+        "id": "repo:eZansiEdgeAI/ezansi-platform-core->concept:blueprint:MENTIONS",
+        "kind": "MENTIONS",
+        "source": "repo:eZansiEdgeAI/ezansi-platform-core",
+        "target": "concept:blueprint"
+      }
+    },
+    {
+      "data": {
+        "confidence": 0.95,
+        "discovered_by": "concept_extractor",
+        "id": "repo:eZansiEdgeAI/ezansi-platform-core->concept:bricks:MENTIONS",
+        "kind": "MENTIONS",
+        "source": "repo:eZansiEdgeAI/ezansi-platform-core",
+        "target": "concept:bricks"
+      }
+    },
+    {
+      "data": {
+        "confidence": 0.95,
+        "discovered_by": "concept_extractor",
+        "id": "repo:eZansiEdgeAI/ezansi-platform-core->concept:capability:MENTIONS",
+        "kind": "MENTIONS",
+        "source": "repo:eZansiEdgeAI/ezansi-platform-core",
+        "target": "concept:capability"
+      }
+    },
+    {
+      "data": {
+        "confidence": 0.95,
+        "discovered_by": "concept_extractor",
+        "id": "repo:eZansiEdgeAI/ezansi-platform-core->concept:contracts:MENTIONS",
+        "kind": "MENTIONS",
+        "source": "repo:eZansiEdgeAI/ezansi-platform-core",
+        "target": "concept:contracts"
+      }
+    },
+    {
+      "data": {
+        "confidence": 0.95,
+        "discovered_by": "concept_extractor",
+        "id": "repo:eZansiEdgeAI/ezansi-platform-core->concept:core:MENTIONS",
+        "kind": "MENTIONS",
+        "source": "repo:eZansiEdgeAI/ezansi-platform-core",
+        "target": "concept:core"
+      }
+    },
+    {
+      "data": {
+        "confidence": 0.95,
+        "discovered_by": "concept_extractor",
+        "id": "repo:eZansiEdgeAI/ezansi-platform-core->concept:platform:MENTIONS",
+        "kind": "MENTIONS",
+        "source": "repo:eZansiEdgeAI/ezansi-platform-core",
+        "target": "concept:platform"
+      }
+    },
+    {
+      "data": {
+        "confidence": 0.95,
+        "discovered_by": "concept_extractor",
+        "id": "repo:eZansiEdgeAI/ezansi-platform-core->concept:platform-core:MENTIONS",
+        "kind": "MENTIONS",
+        "source": "repo:eZansiEdgeAI/ezansi-platform-core",
+        "target": "concept:platform-core"
+      }
+    },
+    {
+      "data": {
+        "confidence": 0.95,
+        "discovered_by": "concept_extractor",
+        "id": "repo:eZansiEdgeAI/ezansi-platform-core->concept:start:MENTIONS",
+        "kind": "MENTIONS",
+        "source": "repo:eZansiEdgeAI/ezansi-platform-core",
+        "target": "concept:start"
+      }
+    },
+    {
+      "data": {
         "confidence": 0.53125,
         "discovered_by": "semantic_linker",
         "id": "repo:McFuzzySquirrel/3d-space-rocks-demo->repo:McFuzzySquirrel/local-workbook-mcp:SIMILAR_TO",
@@ -4679,7 +5717,47 @@
         "source": "repo:McFuzzySquirrel/local-workbook-mcp",
         "target": "repo:McFuzzySquirrel/viben"
       }
+    },
+    {
+      "data": {
+        "confidence": 0.53125,
+        "discovered_by": "semantic_linker",
+        "id": "repo:McFuzzySquirrel/mcfuzzy-test-personal-finance-app->repo:ZansiEdgeAI/ezansi-blueprints:SIMILAR_TO",
+        "kind": "SIMILAR_TO",
+        "source": "repo:McFuzzySquirrel/mcfuzzy-test-personal-finance-app",
+        "target": "repo:ZansiEdgeAI/ezansi-blueprints"
+      }
+    },
+    {
+      "data": {
+        "confidence": 0.53125,
+        "discovered_by": "semantic_linker",
+        "id": "repo:McFuzzySquirrel/mcfuzzy-test-personal-finance-app->repo:eZansiEdgeAI/ezansi-platform-core:SIMILAR_TO",
+        "kind": "SIMILAR_TO",
+        "source": "repo:McFuzzySquirrel/mcfuzzy-test-personal-finance-app",
+        "target": "repo:eZansiEdgeAI/ezansi-platform-core"
+      }
+    },
+    {
+      "data": {
+        "confidence": 0.53125,
+        "discovered_by": "semantic_linker",
+        "id": "repo:McFuzzySquirrel/photo-jumper->repo:eZansiEdgeAI/ezansi-platform-core:SIMILAR_TO",
+        "kind": "SIMILAR_TO",
+        "source": "repo:McFuzzySquirrel/photo-jumper",
+        "target": "repo:eZansiEdgeAI/ezansi-platform-core"
+      }
+    },
+    {
+      "data": {
+        "confidence": 0.64375,
+        "discovered_by": "semantic_linker",
+        "id": "repo:ZansiEdgeAI/ezansi-blueprints->repo:eZansiEdgeAI/ezansi-platform-core:SIMILAR_TO",
+        "kind": "SIMILAR_TO",
+        "source": "repo:ZansiEdgeAI/ezansi-blueprints",
+        "target": "repo:eZansiEdgeAI/ezansi-platform-core"
+      }
     }
   ],
-  "generated_at": "2026-05-05T18:41:42Z"
+  "generated_at": "2026-05-05T19:31:24Z"
 }

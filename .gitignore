@@ -18,6 +18,9 @@ htmlcov/
 .vscode/
 .idea/
 
+# Frontend
+node_modules/
+
 # Dirk runtime caches
 .dirk-cache/
 *.tmp.db

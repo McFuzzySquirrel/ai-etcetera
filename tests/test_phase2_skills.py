@@ -154,3 +154,39 @@ def test_curator_uses_shared_dependencies(tmp_path, monkeypatch):
     # alpha-svc and gamma-tools share at least one dependency (click) and same
     # owner — that's two signals, enough for the curator to pair them.
     assert ("repo:acme/alpha-svc", "repo:acme/gamma-tools") in pairs
+
+
+@pytest.mark.skipif(not _HAS_TOMLLIB, reason="tomllib (used by pyproject parser) requires 3.11+")
+def test_curator_ollama_timeout_falls_back_to_heuristic(tmp_path, monkeypatch):
+    _bootstrap(tmp_path)
+    monkeypatch.delenv("GITHUB_TOKEN", raising=False)
+    monkeypatch.delenv("DIRK_GITHUB_TOKEN", raising=False)
+
+    class _FailingOllamaClient:
+        def __init__(self, *, base_url: str, model: str, timeout_sec: int):
+            self.base_url = base_url
+            self.model = model
+            self.timeout_sec = timeout_sec
+
+        def health(self):
+            return True, "ok"
+
+        def curate_pair(self, *, repo_a: str, repo_b: str, signals: dict[str, object]):
+            raise TimeoutError("timed out")
+
+    monkeypatch.setattr("dirk.skills.connection_curator.OllamaClient", _FailingOllamaClient)
+
+    cfg = load_config(root=tmp_path)
+    cfg.curation.provider = "ollama"
+    cfg.curation.fallback = "heuristic"
+    summary = DirkAgent(cfg).run()
+
+    curator_results = [r for r in summary.skill_results if r.skill == "connection_curator"]
+    assert curator_results
+    assert "switched to heuristic fallback" in (curator_results[0].notes or "")
+
+    graph = json.loads((tmp_path / "graph" / "graph.json").read_text(encoding="utf-8"))
+    edges = [el["data"] for el in graph["elements"] if "source" in el["data"]]
+    compose = [e for e in edges if e["kind"] == "COULD_COMPOSE_WITH"]
+    pairs = {tuple(sorted([e["source"], e["target"]])) for e in compose}
+    assert ("repo:acme/alpha-svc", "repo:acme/gamma-tools") in pairs

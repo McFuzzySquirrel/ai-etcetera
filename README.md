@@ -116,10 +116,14 @@ dirk login                   # interactive GitHub authentication
 
 This command will:
 - Use the GitHub CLI (`gh`) if already authenticated
-- Otherwise, prompt for a personal access token
-- Store the token in your session (add to shell profile to persist)
+- Launch `gh auth login` if not authenticated (opens browser)
+- Otherwise, prompt you to paste a personal access token manually
+- Automatically save the token to `.env` in your project root
+- Load the token for all subsequent `dirk` commands in that project
 
-If you skip this step, Dirk runs in offline mode with minimal metadata.
+Once authenticated, the token persists across sessions in `.env` (which is
+git-ignored for security). If you skip this step, Dirk runs in offline mode
+with minimal metadata.
 
 ### Run a scan
 

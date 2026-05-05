@@ -2,6 +2,7 @@
 
 ::
 
+    dirk login       # authenticate with GitHub interactively
     dirk init        # write default config + scope files
     dirk scan        # run the inventory + dependency-mapping skills
     dirk connect     # run linker + curator skills
@@ -11,7 +12,9 @@
 
 from __future__ import annotations
 
+import os
 import sys
+import subprocess
 from pathlib import Path
 
 import click
@@ -64,6 +67,83 @@ def init(ctx: click.Context, force: bool) -> None:
             continue
         path.write_text(content, encoding="utf-8")
         click.echo(f"wrote {name}")
+
+
+@main.command()
+@click.pass_context
+def login(ctx: click.Context) -> None:
+    """Interactively authenticate with GitHub to get an API token."""
+    # Try using gh CLI first
+    if _try_gh_login():
+        click.echo("GitHub token configured via 'gh auth login'")
+        return
+    
+    # Fall back to manual token entry
+    click.echo("GitHub token not found. Enter your token interactively.")
+    click.echo("Get a token at: https://github.com/settings/tokens")
+    click.echo()
+    
+    token = click.prompt(
+        "GitHub Personal Access Token",
+        hide_input=True,
+        confirmation_prompt=False
+    )
+    
+    if not token:
+        click.echo("No token provided.", err=True)
+        sys.exit(1)
+    
+    # Set it in environment for this session
+    os.environ["GITHUB_TOKEN"] = token
+    click.echo("✓ Token set for this session.")
+    click.echo("To persist across sessions, add to your shell profile:")
+    click.echo("  export GITHUB_TOKEN='<your-token>'")
+    click.echo("or create a .env file in the project root.")
+
+
+def _try_gh_login() -> bool:
+    """Try to use the GitHub CLI (gh) to authenticate. Returns True if successful."""
+    try:
+        # Check if 'gh' is available
+        result = subprocess.run(
+            ["gh", "auth", "status"],
+            capture_output=True,
+            timeout=5
+        )
+        if result.returncode == 0:
+            # Already authenticated, extract the token
+            token_result = subprocess.run(
+                ["gh", "auth", "token"],
+                capture_output=True,
+                text=True,
+                timeout=5
+            )
+            if token_result.returncode == 0:
+                token = token_result.stdout.strip()
+                if token:
+                    os.environ["GITHUB_TOKEN"] = token
+                    return True
+        else:
+            # Not authenticated, prompt for login
+            subprocess.run(
+                ["gh", "auth", "login", "--web"],
+                timeout=300
+            )
+            # Try again to get the token
+            token_result = subprocess.run(
+                ["gh", "auth", "token"],
+                capture_output=True,
+                text=True,
+                timeout=5
+            )
+            if token_result.returncode == 0:
+                token = token_result.stdout.strip()
+                if token:
+                    os.environ["GITHUB_TOKEN"] = token
+                    return True
+    except (FileNotFoundError, subprocess.TimeoutExpired, Exception):
+        pass
+    return False
 
 
 @main.command()

@@ -148,6 +148,40 @@ dirk run --all
 - `findings/latest.md`              — pointer to most recent
 - `findings/delta-YYYY-MM-DD.md`    — what changed since the prior run
 
+### Run the React UI
+
+There are two ways to run the React-based graph viewer.
+
+1. Generated viewer (recommended for normal use):
+
+```bash
+cd frontend
+npm install
+npm run build
+cd ..
+dirk run --all
+```
+
+Then open `graph/graph.html`.
+
+If your browser is strict about `file://` module loading, serve the repo over HTTP:
+
+```bash
+python3 -m http.server 8765
+```
+
+Then open `http://127.0.0.1:8765/graph/graph.html`.
+
+2. Frontend development mode:
+
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+For dev mode, ensure `graph/graph.json` exists first (for example, run `dirk run --all`).
+
 ## Configuration
 
 `dirk.config.yml` controls behaviour:

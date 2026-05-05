@@ -1,37 +1,85 @@
 # Dirk scope file
 #
-# Lists the repositories Dirk should consider as part of the "collection".
-# Format: owner/repo (one per line under `repos:`).
-#
-# Tip: the repository hosting Dirk itself can be included so Dirk notices
-# its own connections to the rest of the collection.
+# Canonicalized repository scope with local checkout paths for deep scanning.
 repos:
-  - slug: McFuzzySquirrel/ai-etcetera
-    path: .
-  - slug: McFuzzySquirrel/mcfuzzy-agent-forge
-    path: ../mcfuzzy-agent-forge
-  - slug: McFuzzySquirrel/viben
-    path: ../viben
-  - slug: McFuzzySquirrel/agent-forge-local
-    path: ../agent-forge-local
-  - slug: McFuzzySquirrel/Engineering-journey-system
-    path: ../Engineering-journey-system
-  - slug: McFuzzySquirrel/exansiedgeai-small
-    path: ../exansiedgeai-small
-  - slug: McFuzzySquirrel/photo-jumper
-    path: ../Sam/photo-jumper
   - slug: McFuzzySquirrel/3d-space-rocks-demo
     path: ../3d-space-rocks-demo
-  - slug: McFuzzySquirrel/mcfuzzy-test-personal-finance-app
-    path: ../mcfuzzy-test-personal-finance-app
+  - slug: McFuzzySquirrel/Audify-ssml-realtime
+    path: checkouts/McFuzzySquirrel/Audify-ssml-realtime
+  - slug: McFuzzySquirrel/Engineering-Journey-System
+    path: ../Engineering-Journey-System
+  - slug: McFuzzySquirrel/McCusker-eng
+    path: checkouts/McFuzzySquirrel/McCusker-eng
+  - slug: McFuzzySquirrel/McFuzzyMarkitDownChunkAndIndex
+    path: checkouts/McFuzzySquirrel/McFuzzyMarkitDownChunkAndIndex
+  - slug: McFuzzySquirrel/Mcc-eng
+    path: checkouts/McFuzzySquirrel/Mcc-eng
+  - slug: McFuzzySquirrel/VoiciFyIt
+    path: ../VoiciFyIt
+  - slug: McFuzzySquirrel/agent-forge-local
+    path: ../agent-forge-local
+  - slug: McFuzzySquirrel/agent-forge-visualizer
+    path: checkouts/McFuzzySquirrel/agent-forge-visualizer
+  - slug: McFuzzySquirrel/ai-etcetera
+    path: .
+  - slug: McFuzzySquirrel/awesome-copilot
+    path: checkouts/McFuzzySquirrel/awesome-copilot
+  - slug: McFuzzySquirrel/awesomeazd
+    path: checkouts/McFuzzySquirrel/awesomeazd
+  - slug: McFuzzySquirrel/dreamworld-codelearn
+    path: checkouts/McFuzzySquirrel/dreamworld-codelearn
+  - slug: McFuzzySquirrel/eZansiEdgeAI
+    path: checkouts/McFuzzySquirrel/eZansiEdgeAI
+  - slug: McFuzzySquirrel/event-demo-tictacto
+    path: checkouts/McFuzzySquirrel/event-demo-tictacto
+  - slug: McFuzzySquirrel/ezansiedgeai-small
+    path: checkouts/McFuzzySquirrel/ezansiedgeai-small
+  - slug: McFuzzySquirrel/fuzzypowerapps
+    path: checkouts/McFuzzySquirrel/fuzzypowerapps
+  - slug: McFuzzySquirrel/hooked-on-hooks
+    path: checkouts/McFuzzySquirrel/hooked-on-hooks
+  - slug: McFuzzySquirrel/local-doc-chat
+    path: checkouts/McFuzzySquirrel/local-doc-chat
+  - slug: McFuzzySquirrel/local-slm-bursting
+    path: checkouts/McFuzzySquirrel/local-slm-bursting
   - slug: McFuzzySquirrel/local-workbook-mcp
     path: ../local-workbook-mcp
-  - slug: McFuzzySquirrel/Voicifyit
-    path: ../Voicifyit
+  - slug: McFuzzySquirrel/mcfuzzy-agent-forge
+    path: ../mcfuzzy-agent-forge
+  - slug: McFuzzySquirrel/mcfuzzy-test-personal-finance-app
+    path: ../mcfuzzy-test-personal-finance-app
+  - slug: McFuzzySquirrel/mcfuzzysquirrel.github.io
+    path: checkouts/McFuzzySquirrel/mcfuzzysquirrel.github.io
+  - slug: McFuzzySquirrel/my-thoughts
+    path: checkouts/McFuzzySquirrel/my-thoughts
+  - slug: McFuzzySquirrel/on-the-road-copilot
+    path: checkouts/McFuzzySquirrel/on-the-road-copilot
+  - slug: McFuzzySquirrel/photo-jumper
+    path: ../Sam/photo-jumper
+  - slug: McFuzzySquirrel/pi-inspector
+    path: checkouts/McFuzzySquirrel/pi-inspector
+  - slug: McFuzzySquirrel/podcastapp
+    path: checkouts/McFuzzySquirrel/podcastapp
   - slug: McFuzzySquirrel/re-me-pi
     path: ../re-me-pi
+  - slug: McFuzzySquirrel/slm-to-azure-bursting
+    path: checkouts/McFuzzySquirrel/slm-to-azure-bursting
+  - slug: McFuzzySquirrel/viben
+    path: ../viben
+  - slug: eZansiEdgeAI/.github
+    path: checkouts/eZansiEdgeAI/.github
+  - slug: eZansiEdgeAI/capability-template
+    path: checkouts/eZansiEdgeAI/capability-template
+  - slug: eZansiEdgeAI/ezansi-blueprints
+    path: ../eZansiEdgeAI/ezansi-blueprints
+  - slug: eZansiEdgeAI/ezansi-capability-llm-ollama
+    path: checkouts/eZansiEdgeAI/ezansi-capability-llm-ollama
+  - slug: eZansiEdgeAI/ezansi-capability-retrieval-chromadb
+    path: checkouts/eZansiEdgeAI/ezansi-capability-retrieval-chromadb
+  - slug: eZansiEdgeAI/ezansi-capability-tts-piper
+    path: checkouts/eZansiEdgeAI/ezansi-capability-tts-piper
   - slug: eZansiEdgeAI/ezansi-platform-core
     path: ../eZansiEdgeAI/ezansi-platform-core
-  - slug: ZansiEdgeAI/ezansi-blueprints
-    path: ../eZansiEdgeAI/ezansi-blueprints
+  - slug: eZansiEdgeAI/ezansieedgeai
+    path: checkouts/eZansiEdgeAI/ezansieedgeai
 

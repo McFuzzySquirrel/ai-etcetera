@@ -8,25 +8,25 @@ scope:
   # Path to a hand-maintained list of repos. Takes precedence over auto-discovery.
   source: repos.yml
   # Optionally pull additional repos from a GitHub user or org.
-  # github_user: McFuzzySquirrel
-  # github_org: ~
-  # include_private: false
+  github_user: McFuzzySquirrel
+  github_org: eZansiEdgeAI
+  include_private: true
 
 # Depth of the scan.
 #   quick    — metadata only (languages, deps, topics)
 #   standard — + READMEs, docs, declared interfaces
 #   deep     — + source-level semantic pass (slower, costs more)
-depth: standard
+depth: deep
 
 # Minimum confidence (0–1) for an edge to appear in the findings doc.
 # Edges below this threshold are still stored in the graph for future runs.
-connection_threshold: 0.35
+connection_threshold: 0.0
 
 # How willing Dirk is to suggest latent / "everything is connected" links.
 #   0.0 — only confident, evidence-backed connections
 #   1.0 — full Dirk mode (the cat is connected to the sofa is connected to
 #         quantum mechanics)
-serendipity: 0.5
+serendipity: 1.0
 
 # Output locations.
 output:
@@ -38,7 +38,16 @@ output:
 # hosted options call out and require credentials in the environment.
 model_preferences:
   embedding: local      # local | hosted
-  curation: hosted      # local | hosted
+  curation: local       # local | hosted
+
+curation:
+  provider: ollama      # heuristic | ollama
+  model: qwen2.5:3b
+  base_url: http://127.0.0.1:11434
+  timeout_sec: 90
+  max_candidates: 200
+  max_suggestions: 100
+  fallback: heuristic   # heuristic | fail
 
 # What the workhorse skills should do on each run.
 skills:

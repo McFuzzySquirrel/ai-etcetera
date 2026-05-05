@@ -103,7 +103,10 @@ fail with an `externally-managed-environment` error (PEP 668).
 dirk init                    # writes default dirk.config.yml + repos.yml
 ```
 
-Edit `repos.yml` to list the repositories you want Dirk to consider.
+Edit `repos.yml` to list the repositories you want Dirk to consider locally.
+You can also set `scope.github_user` and `scope.github_org` in
+`dirk.config.yml` to auto-discover repositories from GitHub; `repos.yml`
+remains the place to pin local checkout paths for the deeper phases.
 
 ### Authenticate with GitHub (optional)
 
@@ -137,6 +140,12 @@ Or do it all in one go:
 
 ```bash
 dirk run --all
+```
+
+Check local Ollama availability before enabling LLM curation:
+
+```bash
+dirk ollama-check
 ```
 
 ### Outputs
@@ -188,26 +197,38 @@ For dev mode, ensure `graph/graph.json` exists first (for example, run `dirk run
 
 ```yaml
 scope:
-  source: repos.yml          # or: github_user: <login> / github_org: <org>
+  source: repos.yml
+  github_user: McFuzzySquirrel   # optional auto-discovery
+  github_org: eZansiEdgeAI       # optional auto-discovery
+  include_private: true          # requires GitHub auth
 depth: standard              # quick | standard | deep
 connection_threshold: 0.35   # weak edges still stored, just not in findings
 serendipity: 0.5             # 0 = only confident links, 1 = full Dirk mode
 output:
   graph_dir: graph
   findings_dir: findings
+curation:
+  provider: heuristic        # heuristic | ollama
+  model: qwen3:8b            # used when provider=ollama
+  base_url: http://127.0.0.1:11434
+  timeout_sec: 45
+  max_candidates: 25
+  max_suggestions: 15
+  fallback: heuristic        # heuristic | fail
 ```
 
-> **Model runtime.** Dirk does not require a hosted model to run. The
-> current Phase 3 implementation is deterministic and local-first
-> (concept extraction + semantic linking), while embeddings/LLM synthesis
-> remain an optional extension path. There is no required API key or
-> hosted-model dependency for the current pipeline. See
-> [`docs/PHASES.md`](docs/PHASES.md) for roadmap detail.
+> **Model runtime.** Dirk does not require a hosted model to run.
+> `curation.provider: heuristic` remains the default. If you want local LLM
+> synthesis, set `curation.provider: ollama`; Dirk will call your local
+> Ollama server and automatically fall back to heuristic mode when configured
+> with `curation.fallback: heuristic`. No API key is required for local mode.
+> See [`docs/PHASES.md`](docs/PHASES.md) for roadmap detail.
 
-`repos.yml` is the hand-maintained scope file. Each entry is either a plain
-`owner/name` slug or a mapping that also points at a local checkout — the
-file-scanning skills (`dependency-mapper`, `interface-extractor`) only have
-something to read when a `path` is provided:
+`repos.yml` is the canonical local-scope file. Each entry is either a plain
+`owner/name` slug or a mapping that also points at a local checkout. The
+file-scanning skills (`dependency-mapper`, `interface-extractor`,
+`concept-extractor`) only have something deep to read when a `path` is
+provided, so keeping local clones materially improves graph quality:
 
 ```yaml
 repos:
@@ -223,7 +244,7 @@ repos:
 | 1 — Skeleton + repo-inventory + SQLite + trivial findings | ✅ implemented |
 | 2 — Explicit connections (deps + interfaces) + viewer    | ✅ manifest parsing + CLI/schema extraction |
 | 3 — Latent connections (concepts + semantic linker)      | ✅ deterministic local concepts + semantic links implemented |
-| 4 — Synthesis (curator)                                  | 🟡 heuristic curator (LLM synthesis pending — see [`docs/PHASES.md`](docs/PHASES.md)) |
+| 4 — Synthesis (curator)                                  | 🟡 working heuristic + Ollama-assisted curator; rationale-only evidence today, full curator CLI/workflow still pending |
 | 5 — Delta tracking                                       | ✅ delta tracking on local runs |
 
 ## Licence

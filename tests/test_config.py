@@ -12,6 +12,8 @@ def test_defaults_when_missing(tmp_path):
     assert cfg.depth == "standard"
     assert cfg.connection_threshold == 0.35
     assert cfg.is_skill_enabled("repo_inventory")
+    assert cfg.curation.provider == "heuristic"
+    assert cfg.curation.model == "qwen3:8b"
 
 
 def test_overrides_applied(tmp_path):
@@ -19,12 +21,20 @@ def test_overrides_applied(tmp_path):
         "depth": "deep",
         "connection_threshold": 0.5,
         "serendipity": 0.9,
+        "curation": {
+            "provider": "ollama",
+            "model": "gemma4:e4b",
+            "max_suggestions": 8,
+        },
         "skills": {"semantic_linker": False},
     }), encoding="utf-8")
     cfg = load_config(root=tmp_path)
     assert cfg.depth == "deep"
     assert cfg.connection_threshold == 0.5
     assert cfg.serendipity == 0.9
+    assert cfg.curation.provider == "ollama"
+    assert cfg.curation.model == "gemma4:e4b"
+    assert cfg.curation.max_suggestions == 8
     assert not cfg.is_skill_enabled("semantic_linker")
     assert cfg.is_skill_enabled("repo_inventory")  # unaffected
 

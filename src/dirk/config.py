@@ -73,6 +73,17 @@ class ModelPreferences:
 
 
 @dataclass
+class CurationConfig:
+    provider: str = "heuristic"  # heuristic | ollama
+    model: str = "qwen3:8b"
+    base_url: str = "http://127.0.0.1:11434"
+    timeout_sec: int = 45
+    max_candidates: int = 25
+    max_suggestions: int = 15
+    fallback: str = "heuristic"  # heuristic | fail
+
+
+@dataclass
 class Config:
     scope: ScopeConfig = field(default_factory=ScopeConfig)
     depth: str = "standard"
@@ -80,6 +91,7 @@ class Config:
     serendipity: float = 0.5
     output: OutputConfig = field(default_factory=OutputConfig)
     model_preferences: ModelPreferences = field(default_factory=ModelPreferences)
+    curation: CurationConfig = field(default_factory=CurationConfig)
     skills: dict[str, bool] = field(default_factory=lambda: {
         "repo_inventory": True,
         "dependency_mapper": True,
@@ -113,6 +125,7 @@ def _coerce(data: dict[str, Any], root: Path) -> Config:
     scope_raw = data.get("scope") or {}
     output_raw = data.get("output") or {}
     models_raw = data.get("model_preferences") or {}
+    curation_raw = data.get("curation") or {}
     skills_raw = data.get("skills") or {}
 
     cfg = Config(
@@ -133,6 +146,15 @@ def _coerce(data: dict[str, Any], root: Path) -> Config:
             embedding=models_raw.get("embedding", "local"),
             curation=models_raw.get("curation", "hosted"),
         ),
+        curation=CurationConfig(
+            provider=str(curation_raw.get("provider", "heuristic")),
+            model=str(curation_raw.get("model", "qwen3:8b")),
+            base_url=str(curation_raw.get("base_url", "http://127.0.0.1:11434")),
+            timeout_sec=int(curation_raw.get("timeout_sec", 45)),
+            max_candidates=int(curation_raw.get("max_candidates", 25)),
+            max_suggestions=int(curation_raw.get("max_suggestions", 15)),
+            fallback=str(curation_raw.get("fallback", "heuristic")),
+        ),
         skills={**Config().skills, **{k: bool(v) for k, v in skills_raw.items()}},
         cost_ceiling_usd=data.get("cost_ceiling_usd"),
         root=root,
@@ -143,6 +165,14 @@ def _coerce(data: dict[str, Any], root: Path) -> Config:
         raise ValueError("connection_threshold must be in [0, 1]")
     if not 0.0 <= cfg.serendipity <= 1.0:
         raise ValueError("serendipity must be in [0, 1]")
+    if cfg.curation.provider not in {"heuristic", "ollama"}:
+        raise ValueError("curation.provider must be 'heuristic' or 'ollama'")
+    if cfg.curation.fallback not in {"heuristic", "fail"}:
+        raise ValueError("curation.fallback must be 'heuristic' or 'fail'")
+    if cfg.curation.timeout_sec <= 0:
+        raise ValueError("curation.timeout_sec must be > 0")
+    if cfg.curation.max_candidates <= 0 or cfg.curation.max_suggestions <= 0:
+        raise ValueError("curation.max_candidates and curation.max_suggestions must be > 0")
     return cfg
 
 

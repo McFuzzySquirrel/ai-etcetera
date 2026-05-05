@@ -80,3 +80,59 @@ def test_second_run_emits_delta(tmp_path, monkeypatch):
     assert summary.delta_path is not None and summary.delta_path.exists()
     delta = summary.delta_path.read_text(encoding="utf-8")
     assert "gamma/four" in delta
+
+
+def test_resolve_repos_merges_source_and_discovery(tmp_path, monkeypatch):
+    (tmp_path / "dirk.config.yml").write_text(yaml.safe_dump({
+        "scope": {
+            "source": "repos.yml",
+            "github_user": "McFuzzySquirrel",
+            "github_org": "eZansiEdgeAI",
+            "include_private": True,
+        },
+    }), encoding="utf-8")
+    (tmp_path / "repos.yml").write_text(yaml.safe_dump({
+        "repos": [
+            {"slug": "alpha/one", "path": "./alpha-one"},
+            "beta/two",
+        ],
+    }), encoding="utf-8")
+
+    cfg = load_config(root=tmp_path)
+    agent = DirkAgent(cfg)
+
+    from dirk.config import RepoSource
+
+    monkeypatch.setattr(
+        agent,
+        "_discover_scope_repos",
+        lambda: [
+            RepoSource("beta/two", None),
+            RepoSource("gamma/three", None),
+        ],
+    )
+
+    repos = agent.resolve_repos()
+    slugs = [r.slug for r in repos]
+    assert slugs == ["alpha/one", "beta/two", "gamma/three"]
+
+    # Keep local path from repos.yml when the slug already exists.
+    alpha = next(r for r in repos if r.slug == "alpha/one")
+    assert alpha.path is not None
+
+
+def test_discovery_returns_empty_without_token(tmp_path, monkeypatch):
+    (tmp_path / "dirk.config.yml").write_text(yaml.safe_dump({
+        "scope": {
+            "source": "repos.yml",
+            "github_user": "McFuzzySquirrel",
+        },
+    }), encoding="utf-8")
+    (tmp_path / "repos.yml").write_text("repos: []\n", encoding="utf-8")
+
+    monkeypatch.delenv("GITHUB_TOKEN", raising=False)
+    monkeypatch.delenv("DIRK_GITHUB_TOKEN", raising=False)
+
+    cfg = load_config(root=tmp_path)
+    agent = DirkAgent(cfg)
+    assert agent._discover_scope_repos() == []

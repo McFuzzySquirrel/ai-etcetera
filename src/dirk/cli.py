@@ -28,6 +28,7 @@ from dirk.config import (
     read_github_token,
     save_github_token,
 )
+from dirk.ollama import OllamaClient
 
 
 SCAN_SKILLS = ["repo_inventory", "dependency_mapper", "interface_extractor"]
@@ -173,6 +174,27 @@ def report(ctx: click.Context) -> None:
     _run_with(ctx, only=[])
 
 
+@main.command("ollama-check")
+@click.pass_context
+def ollama_check(ctx: click.Context) -> None:
+    """Check local Ollama runtime/model availability for curation."""
+    cfg = ctx.obj["config"]
+    client = OllamaClient(
+        base_url=cfg.curation.base_url,
+        model=cfg.curation.model,
+        timeout_sec=cfg.curation.timeout_sec,
+    )
+    ok, reason = client.health()
+    if ok:
+        click.echo(
+            f"Ollama ready: provider={cfg.curation.provider} model={cfg.curation.model} "
+            f"url={cfg.curation.base_url}"
+        )
+        return
+    click.echo(f"Ollama check failed: {reason}", err=True)
+    sys.exit(1)
+
+
 @main.command()
 @click.option("--all", "all_skills", is_flag=True, help="Run every enabled skill in order.")
 @click.option("--only", multiple=True, help="Run only these skill names.")
@@ -218,6 +240,14 @@ output:
 model_preferences:
   embedding: local
   curation: hosted
+curation:
+    provider: heuristic       # heuristic | ollama
+    model: qwen3:8b
+    base_url: http://127.0.0.1:11434
+    timeout_sec: 45
+    max_candidates: 25
+    max_suggestions: 15
+    fallback: heuristic       # heuristic | fail
 skills:
   repo_inventory: true
   dependency_mapper: true

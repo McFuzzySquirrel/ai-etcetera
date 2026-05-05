@@ -162,12 +162,6 @@ repos:
     path: ./checkouts/repo-two         # relative to repos.yml's directory
 ```
 
-## Periodic execution
-
-A scheduled GitHub Actions workflow (`.github/workflows/dirk-scan.yml`) runs
-weekly, opens a PR with the updated graph + findings, and keeps the human in
-the loop on what Dirk has noticed.
-
 ## Status
 
 | Phase | Status |
@@ -176,7 +170,7 @@ the loop on what Dirk has noticed.
 | 2 — Explicit connections (deps + interfaces) + viewer    | ✅ manifest parsing + CLI/schema extraction |
 | 3 — Latent connections (concepts + semantic linker)      | ✅ deterministic local concepts + semantic links implemented |
 | 4 — Synthesis (curator)                                  | 🟡 heuristic curator (LLM synthesis pending — see [`docs/PHASES.md`](docs/PHASES.md)) |
-| 5 — Periodic + delta + PR loop                           | ✅ workflow + delta implemented |
+| 5 — Delta tracking                                       | ✅ delta tracking on local runs |
 
 ## Licence
 

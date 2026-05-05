@@ -4,49 +4,123 @@
   <meta charset="utf-8" />
   <title>Dirk — Holistic Discovery Graph</title>
   <style>
-    html, body { margin: 0; padding: 0; height: 100%; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
-    #cy { width: 100%; height: 100vh; background: #fafafa; }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; height: 100%; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+    body { display: flex; }
+    #cy { flex: 1; height: 100vh; background: linear-gradient(135deg, #fafbfc 0%, #f5f7fa 100%); }
+    .panel {
+      position: absolute; background: rgba(255,255,255,0.96); border-radius: 8px; padding: 12px 14px;
+      border: 1px solid #e1e4e8; box-shadow: 0 2px 8px rgba(0,0,0,0.1); font-size: 13px; z-index: 10;
+    }
+    #legend { top: 12px; left: 12px; max-width: 280px; }
+    #legend h1 { font-size: 15px; margin: 0 0 8px 0; font-weight: 600; color: #24292e; }
+    #legend-kinds { margin-bottom: 10px; }
+    .legend-item { margin: 5px 0; display: flex; align-items: center; }
+    .swatch { display: inline-block; width: 12px; height: 12px; border-radius: 50%; margin-right: 8px; flex-shrink: 0; }
+    #legend-edges { border-top: 1px solid #e1e4e8; padding-top: 10px; }
+    .edge-legend { margin: 4px 0; font-size: 12px; color: #586069; }
+    .dashed { border-bottom: 2px dashed #e45756; width: 20px; display: inline-block; margin-right: 6px; }
+    .solid { border-bottom: 2px solid #f58518; width: 20px; display: inline-block; margin-right: 6px; }
     #status {
-      position: absolute; top: 12px; right: 12px;
-      max-width: 45ch;
-      background: rgba(252, 242, 242, 0.96);
-      border: 1px solid #e6b3b3;
-      border-radius: 6px;
-      padding: 8px 10px;
-      font-size: 12px;
-      color: #7a1f1f;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+      top: 12px; right: 12px; max-width: 50ch;
+      background: rgba(252, 242, 242, 0.96); border: 1px solid #e6b3b3; color: #7a1f1f;
       display: none;
-      z-index: 2;
     }
-    #legend {
-      position: absolute; top: 12px; left: 12px;
-      background: rgba(255,255,255,0.92); border: 1px solid #ddd;
-      border-radius: 6px; padding: 10px 14px; font-size: 13px;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+    #info-panel {
+      bottom: 12px; right: 12px; max-width: 320px; max-height: 60vh; overflow-y: auto;
+      background: rgba(255,255,255,0.98); display: none; flex-direction: column;
     }
-    #legend h1 { font-size: 14px; margin: 0 0 6px 0; }
-    .swatch { display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 6px; vertical-align: middle; }
-    a { color: #06c; }
+    #info-panel.active { display: flex; }
+    #info-header { font-weight: 600; margin-bottom: 8px; color: #24292e; padding-bottom: 8px; border-bottom: 1px solid #e1e4e8; }
+    .prop-row { margin: 6px 0; display: flex; flex-direction: column; }
+    .prop-label { font-weight: 500; color: #586069; font-size: 12px; }
+    .prop-value { color: #24292e; font-size: 13px; word-break: break-word; }
+    #controls {
+      bottom: 12px; left: 12px; display: flex; gap: 6px; flex-wrap: wrap; max-width: 200px;
+    }
+    .btn {
+      padding: 6px 12px; background: white; border: 1px solid #d1d5da; border-radius: 6px;
+      font-size: 12px; cursor: pointer; transition: all 0.15s;
+      color: #24292e; font-weight: 500;
+    }
+    .btn:hover { background: #f6f8fa; border-color: #0366d6; color: #0366d6; }
+    .btn:active { background: #e1e6ed; }
+    #search-box {
+      top: 50%; left: 12px; transform: translateY(-50%); width: 200px;
+      background: white; border: 1px solid #d1d5da; border-radius: 6px;
+      padding: 8px 10px; font-size: 13px; color: #24292e;
+    }
+    #search-box::placeholder { color: #999; }
+    #search-results { position: absolute; top: calc(50% + 40px); left: 12px; width: 200px;
+      background: white; border: 1px solid #d1d5da; border-radius: 6px;
+      max-height: 200px; overflow-y: auto; display: none; z-index: 12;
+    }
+    .search-result { padding: 6px 10px; cursor: pointer; border-bottom: 1px solid #f0f0f0; }
+    .search-result:hover { background: #f6f8fa; }
+    .search-result.active { background: #fff3cd; }
+    #help { top: 12px; right: 12px; max-width: 250px; max-height: 70vh; overflow-y: auto;
+      background: rgba(255,255,255,0.98); display: none; }
+    #help.active { display: block; }
+    #help h2 { font-size: 14px; margin: 0 0 10px 0; color: #24292e; }
+    .help-section { margin-bottom: 12px; }
+    .help-item { margin: 6px 0; font-size: 12px; color: #586069; }
+    .kbd { background: #f3f3f3; border: 1px solid #ccc; border-radius: 3px; padding: 2px 5px; font-family: monospace; }
+    a { color: #0366d6; text-decoration: none; }
+    a:hover { text-decoration: underline; }
   </style>
   <script src="https://unpkg.com/cytoscape@3.30.0/dist/cytoscape.min.js"></script>
 </head>
 <body>
-  <div id="legend">
+  <div id="legend" class="panel">
     <h1>Dirk — Holistic Discovery</h1>
-    <div><span class="swatch" style="background:#4c78a8"></span>Repo</div>
-    <div><span class="swatch" style="background:#f58518"></span>Concept</div>
-    <div><span class="swatch" style="background:#54a24b"></span>Technology</div>
-    <div><span class="swatch" style="background:#b279a2"></span>Interface</div>
-    <div><span class="swatch" style="background:#9d755d"></span>Person</div>
-    <div><span class="swatch" style="background:#bab0ac"></span>Other</div>
-    <p style="margin: 8px 0 0 0; color: #666;">Generated by Dirk · open <code>graph.json</code> for raw data</p>
+    <div id="legend-kinds">
+      <div class="legend-item"><span class="swatch" style="background:#4c78a8"></span>Repo</div>
+      <div class="legend-item"><span class="swatch" style="background:#f58518"></span>Concept</div>
+      <div class="legend-item"><span class="swatch" style="background:#54a24b"></span>Technology</div>
+      <div class="legend-item"><span class="swatch" style="background:#b279a2"></span>Interface</div>
+      <div class="legend-item"><span class="swatch" style="background:#9d755d"></span>Person</div>
+      <div class="legend-item"><span class="swatch" style="background:#bab0ac"></span>Other</div>
+    </div>
+    <div id="legend-edges">
+      <div style="font-weight: 600; margin-bottom: 6px; color: #24292e;">Edge types</div>
+      <div class="edge-legend"><span class="solid"></span>SIMILAR_TO</div>
+      <div class="edge-legend"><span class="dashed"></span>COULD_COMPOSE</div>
+      <div style="font-size: 12px; color: #999; margin-top: 10px;">Double-click nodes • Search with /<br/>Press <span class="kbd">?</span> for help</div>
+    </div>
   </div>
-  <div id="status"></div>
+  <input id="search-box" type="text" placeholder="Search nodes..." />
+  <div id="search-results"></div>
+  <div id="controls">
+    <button class="btn" id="fit-btn" title="Fit to screen (Space)">Fit</button>
+    <button class="btn" id="reset-btn" title="Reset zoom">Reset</button>
+    <button class="btn" id="help-btn" title="Show help">Help</button>
+  </div>
+  <div id="status" class="panel"></div>
+  <div id="info-panel" class="panel"></div>
+  <div id="help" class="panel">
+    <h2>Graph Controls</h2>
+    <div class="help-section">
+      <div class="help-item"><strong>Double-click</strong> — Show node details</div>
+      <div class="help-item"><strong>Click</strong> — Select node & highlight connections</div>
+      <div class="help-item"><strong>Drag</strong> — Pan the graph</div>
+      <div class="help-item"><strong>Scroll</strong> — Zoom in/out</div>
+      <div class="help-item"><strong>/</strong> — Open search</div>
+      <div class="help-item"><strong>Space</strong> — Fit all to view</div>
+      <div class="help-item"><strong>Esc</strong> — Deselect & close panels</div>
+    </div>
+    <div class="help-section">
+      <div style="font-size: 12px; color: #999;">Generated by Dirk</div>
+    </div>
+  </div>
   <div id="cy"></div>
   <script id="dirk-graph-data" type="application/json">__DIRK_GRAPH_DATA__</script>
   <script>
     const statusEl = document.getElementById('status');
+    const infoPanelEl = document.getElementById('info-panel');
+    const helpEl = document.getElementById('help');
+    const searchBox = document.getElementById('search-box');
+    const searchResults = document.getElementById('search-results');
+    let cy = null;
 
     function showStatus(msg) {
       statusEl.textContent = msg;
@@ -65,47 +139,98 @@
       }
     }
 
+    function getNodeColor(kind) {
+      const colors = {
+        Repo: '#4c78a8', Concept: '#f58518', Technology: '#54a24b',
+        Interface: '#b279a2', Person: '#9d755d', Domain: '#e45756', Artifact: '#72b7b2',
+      };
+      return colors[kind] || '#bab0ac';
+    }
+
+    function showNodeInfo(node) {
+      const data = node.data();
+      let html = `<div id="info-header">${data.label}</div>`;
+      html += `<div class="prop-row"><span class="prop-label">Type</span><span class="prop-value">${data.kind}</span></div>`;
+      if (data.confidence) html += `<div class="prop-row"><span class="prop-label">Confidence</span><span class="prop-value">${(data.confidence * 100).toFixed(0)}%</span></div>`;
+      
+      const props = Object.entries(data).filter(([k]) => !['id', 'label', 'kind', 'confidence', 'source', 'target'].includes(k));
+      props.forEach(([k, v]) => {
+        const val = typeof v === 'object' ? JSON.stringify(v).slice(0, 80) : String(v);
+        html += `<div class="prop-row"><span class="prop-label">${k}</span><span class="prop-value">${val}</span></div>`;
+      });
+      
+      infoPanelEl.innerHTML = html;
+      infoPanelEl.classList.add('active');
+    }
+
+    function clearInfoPanel() {
+      infoPanelEl.classList.remove('active');
+    }
+
+    function closeSearch() {
+      searchBox.value = '';
+      searchResults.style.display = 'none';
+      searchBox.blur();
+    }
+
     function renderGraph(data) {
       if (!window.cytoscape) {
-        showStatus('Could not load Cytoscape.js. Check your network connection and reload this page.');
+        showStatus('Could not load Cytoscape.js. Check your network.');
         return;
       }
-      const colorByKind = {
-        Repo: '#4c78a8',
-        Concept: '#f58518',
-        Technology: '#54a24b',
-        Interface: '#b279a2',
-        Person: '#9d755d',
-        Domain: '#e45756',
-        Artifact: '#72b7b2',
-      };
-      cytoscape({
+      const nodeMap = {};
+      data.elements.filter(e => !e.data.source).forEach(e => {
+        nodeMap[e.data.id] = e.data.label;
+      });
+
+      cy = cytoscape({
         container: document.getElementById('cy'),
         elements: data.elements,
-        layout: { name: 'cose', animate: false, idealEdgeLength: 120, nodeOverlap: 20 },
+        layout: { name: 'cose', animate: true, animationDuration: 500, idealEdgeLength: 140, nodeOverlap: 25 },
+        autoungrabify: false,
         style: [
           {
             selector: 'node',
             style: {
               'label': 'data(label)',
-              'background-color': ele => colorByKind[ele.data('kind')] || '#bab0ac',
-              'color': '#222', 'font-size': 11,
-              'text-valign': 'bottom', 'text-margin-y': 4,
-              'width': 18, 'height': 18,
+              'background-color': ele => getNodeColor(ele.data('kind')),
+              'color': '#222', 'font-size': 11, 'font-weight': 500,
+              'text-valign': 'center', 'text-halign': 'center',
+              'width': 24, 'height': 24,
+              'z-index': 10,
+              'overlay-padding': 2,
+              'box-shadow': '0 0 0 0 rgba(0,0,0,0.1)',
+            },
+          },
+          {
+            selector: 'node:selected',
+            style: {
+              'box-shadow': '0 0 0 3px rgba(3,102,214,0.3)',
+              'z-index': 20,
+              'width': 30, 'height': 30,
+            },
+          },
+          {
+            selector: 'node:active',
+            style: {
+              'width': 28, 'height': 28,
             },
           },
           {
             selector: 'edge',
             style: {
-              'width': ele => Math.max(1, (ele.data('confidence') || 0.5) * 4),
-              'line-color': '#bbb',
-              'target-arrow-color': '#bbb',
-              'target-arrow-shape': 'triangle',
-              'curve-style': 'bezier',
-              'opacity': 0.7,
-              'label': 'data(kind)', 'font-size': 8, 'color': '#888',
-              'text-rotation': 'autorotate',
+              'width': ele => Math.max(1.5, (ele.data('confidence') || 0.5) * 3),
+              'line-color': '#ccc', 'target-arrow-color': '#ccc',
+              'target-arrow-shape': 'triangle', 'curve-style': 'bezier',
+              'opacity': 0.5, 'label': 'data(kind)',
+              'font-size': 9, 'color': '#999', 'text-rotation': 'autorotate',
+              'text-background-color': 'white', 'text-background-opacity': 0.8,
+              'text-background-padding': '2px',
             },
+          },
+          {
+            selector: 'edge:selected, edge.highlighted',
+            style: { 'opacity': 1, 'width': ele => Math.max(2, (ele.data('confidence') || 0.5) * 4) },
           },
           {
             selector: 'edge[kind = "COULD_COMPOSE_WITH"]',
@@ -115,7 +240,102 @@
             selector: 'edge[kind = "SIMILAR_TO"]',
             style: { 'line-color': '#f58518', 'target-arrow-color': '#f58518' },
           },
+          {
+            selector: 'node.hidden',
+            style: { 'opacity': 0.2, 'z-index': 1 },
+          },
+          {
+            selector: 'edge.hidden',
+            style: { 'opacity': 0.05 },
+          },
         ],
+      });
+
+      // Double-click to show details
+      cy.on('dbltap', 'node', (evt) => {
+        showNodeInfo(evt.target);
+      });
+
+      // Selection & highlighting
+      cy.on('select', 'node', (evt) => {
+        const node = evt.target;
+        const neighbors = node.predecessors().union(node.successors());
+        cy.elements().not(node).not(neighbors).addClass('hidden');
+        neighbors.classList.remove('hidden');
+      });
+
+      cy.on('unselect', 'node', () => {
+        cy.elements().removeClass('hidden');
+      });
+
+      // Search functionality
+      function updateSearch(query) {
+        query = query.toLowerCase();
+        if (!query) {
+          searchResults.style.display = 'none';
+          return;
+        }
+        const matches = cy.nodes().filter(n => n.data('label').toLowerCase().includes(query)).slice(0, 10);
+        if (matches.length === 0) {
+          searchResults.innerHTML = '<div style="padding: 10px; color: #999;">No matches</div>';
+        } else {
+          searchResults.innerHTML = matches.map(n => 
+            `<div class="search-result" data-id="${n.id()}">${n.data('label')}</div>`
+          ).join('');
+        }
+        searchResults.style.display = 'block';
+      }
+
+      searchBox.addEventListener('input', (e) => updateSearch(e.target.value));
+
+      searchResults.addEventListener('click', (e) => {
+        if (e.target.classList.contains('search-result')) {
+          const id = e.target.getAttribute('data-id');
+          const node = cy.getElementById(id);
+          node.select();
+          cy.animate({ fit: { eles: node, padding: 100 }, duration: 300 });
+          closeSearch();
+        }
+      });
+
+      // Keyboard shortcuts
+      document.addEventListener('keydown', (e) => {
+        if (e.key === '/') {
+          e.preventDefault();
+          searchBox.focus();
+        } else if (e.key === ' ') {
+          e.preventDefault();
+          cy.animate({ fit: { eles: cy.elements(), padding: 50 }, duration: 300 });
+        } else if (e.key === 'Escape') {
+          cy.elements().unselect();
+          closeSearch();
+          helpEl.classList.remove('active');
+          clearInfoPanel();
+        } else if (e.key === '?') {
+          helpEl.classList.toggle('active');
+        }
+      });
+
+      // Control buttons
+      document.getElementById('fit-btn').addEventListener('click', () => {
+        cy.animate({ fit: { eles: cy.elements(), padding: 50 }, duration: 300 });
+      });
+
+      document.getElementById('reset-btn').addEventListener('click', () => {
+        cy.elements().unselect();
+        cy.animate({ zoom: 1, pan: { x: 0, y: 0 }, duration: 300 });
+      });
+
+      document.getElementById('help-btn').addEventListener('click', () => {
+        helpEl.classList.toggle('active');
+      });
+
+      // Click on canvas to deselect
+      cy.on('tap', (evt) => {
+        if (evt.target === cy) {
+          cy.elements().unselect();
+          clearInfoPanel();
+        }
       });
     }
 
@@ -130,7 +350,7 @@
         })
         .then(renderGraph)
         .catch(() => {
-          showStatus('Could not load graph data. If you opened this as file://, run Dirk again to regenerate graph.html with embedded data.');
+          showStatus('Could not load graph data. If you opened this as file://, run Dirk again to regenerate graph.html.');
         });
     }
   </script>

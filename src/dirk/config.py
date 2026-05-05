@@ -7,10 +7,17 @@ Dirk reads two files:
 
 Both are optional in the sense that the loader will fall back to sane defaults
 if the files are missing.
+
+GitHub credentials are read from:
+
+* ``GITHUB_TOKEN`` environment variable (highest priority)
+* ``DIRK_GITHUB_TOKEN`` environment variable
+* ``.env`` file in the project root (automatically loaded on config init)
 """
 
 from __future__ import annotations
 
+import os
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
@@ -140,8 +147,17 @@ def _coerce(data: dict[str, Any], root: Path) -> Config:
 
 
 def load_config(path: str | Path | None = None, root: str | Path | None = None) -> Config:
-    """Load Dirk configuration. Missing file → defaults."""
+    """Load Dirk configuration. Missing file → defaults.
+    
+    Also loads any GitHub token from .env file into the environment.
+    """
     root_path = Path(root) if root else Path.cwd()
+    
+    # Load GitHub token from .env if present
+    token = read_github_token(root_path)
+    if token and "GITHUB_TOKEN" not in os.environ and "DIRK_GITHUB_TOKEN" not in os.environ:
+        os.environ["GITHUB_TOKEN"] = token
+    
     cfg_path = Path(path) if path else root_path / DEFAULT_CONFIG_PATH
     if not cfg_path.exists():
         return Config(root=root_path)
@@ -197,3 +213,68 @@ def load_repos(path: str | Path) -> list[RepoSource]:
         seen.add(slug)
         cleaned.append(RepoSource(slug=slug, path=local))
     return cleaned
+
+
+# -- GitHub token management -------------------------------------------------
+
+def read_github_token(root: Path | None = None) -> str | None:
+    """Read GitHub token from environment or persisted .env file.
+    
+    Priority order:
+    1. GITHUB_TOKEN environment variable
+    2. DIRK_GITHUB_TOKEN environment variable
+    3. Token stored in .env file in the project root
+    """
+    # Check environment variables first
+    token = os.environ.get("GITHUB_TOKEN") or os.environ.get("DIRK_GITHUB_TOKEN")
+    if token:
+        return token
+    
+    # Check .env file in project root
+    root_path = Path(root) if root else Path.cwd()
+    env_file = root_path / ".env"
+    if env_file.exists():
+        try:
+            with env_file.open("r", encoding="utf-8") as f:
+                for line in f:
+                    line = line.strip()
+                    if line.startswith("GITHUB_TOKEN="):
+                        token = line.split("=", 1)[1].strip().strip("\"'")
+                        if token:
+                            return token
+        except Exception:
+            pass
+    
+    return None
+
+
+def save_github_token(token: str, root: Path | None = None) -> Path:
+    """Save GitHub token to .env file in project root.
+    
+    Returns the path to the .env file.
+    Overwrites any existing GITHUB_TOKEN in the file.
+    """
+    root_path = Path(root) if root else Path.cwd()
+    env_file = root_path / ".env"
+    
+    # Read existing content
+    existing_lines: list[str] = []
+    if env_file.exists():
+        try:
+            with env_file.open("r", encoding="utf-8") as f:
+                existing_lines = [line.rstrip("\n") for line in f.readlines()]
+        except Exception:
+            pass
+    
+    # Remove existing GITHUB_TOKEN lines and add new one
+    new_lines = [line for line in existing_lines if not line.startswith("GITHUB_TOKEN=")]
+    new_lines.append(f'GITHUB_TOKEN="{token}"')
+    
+    # Write back
+    with env_file.open("w", encoding="utf-8") as f:
+        f.write("\n".join(new_lines))
+        if new_lines:  # Add trailing newline if there's content
+            f.write("\n")
+    
+    return env_file
+

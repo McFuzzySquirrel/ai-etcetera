@@ -63,8 +63,8 @@ and produces:
 | `repo-inventory` | 1 | Refresh repos; extract languages, deps, entry points, READMEs, topics, owners, last-touched dates. |
 | `dependency-mapper` | 2 | Explicit edges: package deps, submodules, cross-repo imports, doc/issue references. |
 | `interface-extractor` | 2 | Public surface area: HTTP routes, CLI commands, exported symbols, schema files, event names. |
-| `concept-extractor` | 3 | Pulls domain concepts from READMEs/docs/comments/commits; embeds them. |
-| `semantic-linker` | 3 | Proposes latent connections via embeddings + LLM pass. |
+| `concept-extractor` | 3 | Deterministically extracts concepts from local READMEs/docs/manifests and emits `Concept` + `MENTIONS` edges with evidence. |
+| `semantic-linker` | 3 | Deterministically proposes `SIMILAR_TO` repo links from shared concept mentions (serendipity-scaled threshold). |
 | `connection-curator` | 4 | Synthesises raw edges into ranked, human-readable findings and composition proposals. |
 | `graph-writer` | always | Persists the graph and emits the visual viewer. |
 | `report-writer` | always | Renders findings + delta Markdown. |
@@ -74,6 +74,7 @@ and produces:
 - **Storage:** SQLite (`graph/graph.db`) — file-based, diffable, commits cleanly.
   Upgrade path: DuckDB / Kuzu / Neo4j.
 - **Embeddings:** stored alongside concept nodes in a `vectors` table.
+- **Embeddings:** schema/table support exists; runtime embedding generation is optional and can be layered in later.
 - **Schema:**
   - **Nodes:** `Repo`, `Concept`, `Technology`, `Interface`, `Person`,
     `Domain`, `Artifact`.
@@ -103,6 +104,26 @@ dirk init                    # writes default dirk.config.yml + repos.yml
 ```
 
 Edit `repos.yml` to list the repositories you want Dirk to consider.
+
+### Authenticate with GitHub (optional)
+
+For richer repository metadata (languages, topics, recent activity), authenticate
+with GitHub:
+
+```bash
+dirk login                   # interactive GitHub authentication
+```
+
+This command will:
+- Use the GitHub CLI (`gh`) if already authenticated
+- Launch `gh auth login` if not authenticated (opens browser)
+- Otherwise, prompt you to paste a personal access token manually
+- Automatically save the token to `.env` in your project root
+- Load the token for all subsequent `dirk` commands in that project
+
+Once authenticated, the token persists across sessions in `.env` (which is
+git-ignored for security). If you skip this step, Dirk runs in offline mode
+with minimal metadata.
 
 ### Run a scan
 
@@ -142,12 +163,12 @@ output:
   findings_dir: findings
 ```
 
-> **Model runtime.** Dirk does not own a model. The "smart" skills
-> (Phases 3 & 4) are designed to run inside whatever agent session you
-> already use — GitHub Copilot CLI, the Copilot coding agent, etc. —
-> and write into the graph through small CLI verbs. There is no
-> hosted-model dependency, no API key, no cost-ceiling logic in this
-> repo. See [`docs/PHASES.md`](docs/PHASES.md) for the full design.
+> **Model runtime.** Dirk does not require a hosted model to run. The
+> current Phase 3 implementation is deterministic and local-first
+> (concept extraction + semantic linking), while embeddings/LLM synthesis
+> remain an optional extension path. There is no required API key or
+> hosted-model dependency for the current pipeline. See
+> [`docs/PHASES.md`](docs/PHASES.md) for roadmap detail.
 
 `repos.yml` is the hand-maintained scope file. Each entry is either a plain
 `owner/name` slug or a mapping that also points at a local checkout — the
@@ -161,21 +182,15 @@ repos:
     path: ./checkouts/repo-two         # relative to repos.yml's directory
 ```
 
-## Periodic execution
-
-A scheduled GitHub Actions workflow (`.github/workflows/dirk-scan.yml`) runs
-weekly, opens a PR with the updated graph + findings, and keeps the human in
-the loop on what Dirk has noticed.
-
 ## Status
 
 | Phase | Status |
 |---|---|
 | 1 — Skeleton + repo-inventory + SQLite + trivial findings | ✅ implemented |
 | 2 — Explicit connections (deps + interfaces) + viewer    | ✅ manifest parsing + CLI/schema extraction |
-| 3 — Latent connections (concepts + semantic linker)      | 🟡 stubs in place — see [`docs/PHASES.md`](docs/PHASES.md) |
+| 3 — Latent connections (concepts + semantic linker)      | ✅ deterministic local concepts + semantic links implemented |
 | 4 — Synthesis (curator)                                  | 🟡 heuristic curator (LLM synthesis pending — see [`docs/PHASES.md`](docs/PHASES.md)) |
-| 5 — Periodic + delta + PR loop                           | ✅ workflow + delta implemented |
+| 5 — Delta tracking                                       | ✅ delta tracking on local runs |
 
 ## Licence
 

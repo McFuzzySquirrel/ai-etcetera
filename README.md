@@ -260,6 +260,12 @@ repos:
 | 4 — Synthesis (curator)                                  | 🟡 working heuristic + Ollama-assisted curator; rationale-only evidence today, full curator CLI/workflow still pending |
 | 5 — Delta tracking                                       | ✅ delta tracking on local runs |
 
+## Further reading
+
+- [`docs/PHASES.md`](docs/PHASES.md) — current implementation status and roadmap
+- [`docs/adr/`](docs/adr/README.md) — architecture decision records
+- [`docs/blog/`](docs/blog/README.md) — longer-form posts on the concepts and design
+
 ## Licence
 
 See [LICENSE](LICENSE).

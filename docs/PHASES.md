@@ -4,6 +4,7 @@ This document reflects the current implementation state of Dirk, not the
 original speculative plan.
 
 For architectural decisions see [`docs/adr/`](adr/README.md).
+For conceptual background see [`docs/blog/`](blog/README.md).
 
 ## Current phase status
 

@@ -130,6 +130,7 @@ Phase 2 ──────┼── dependency-mapper
                │── interface-extractor
                │
 Phase 3 ──────┼── concept-extractor
+               │── origin-tracer
                │── semantic-linker
                │
 Phase 4 ──────┼── connection-curator
@@ -184,6 +185,33 @@ For example, a repository whose README repeatedly mentions "knowledge graph",
 "triple store", and "delta tracking" will end up with `Concept` nodes for those
 terms, each carrying evidence pointing at the specific file and position where
 the term appeared.
+
+**`origin-tracer`** asks a different question: *why does this repository exist,
+and what came before it?* It works in two passes.
+
+*Motivation extraction.* The skill scans each repository's README and docs for
+a section that answers the "why" question — headings like `## Why`, `## Motivation`,
+`## Background`, `## Rationale`, `## Origin`, and several other intent-declaring
+variants. When it finds one, it captures the text beneath it (up to roughly
+400 characters) as a `Motivation` node and emits a `MOTIVATED_BY` edge. If no
+explicit section exists, it falls back to the first substantial paragraph in the
+README, at a lower confidence score. Either way, the result is a human-readable
+statement, in the author's own words, explaining the repo's purpose.
+
+*Lineage detection.* The skill then scans for cross-references to other repositories
+in scope (by slug or short name) that appear alongside recognised lineage keywords.
+Two strength levels are distinguished:
+
+- **`EVOLVED_FROM`** (confidence 0.75) — strong keywords like *evolved from*,
+  *forked from*, *rewrite of*, *successor to*. These indicate direct ancestry:
+  the current repo picks up where another left off.
+- **`INSPIRED_BY`** (confidence 0.55) — softer keywords like *inspired by*,
+  *based on*, *builds on*, *learned from*. These capture an intellectual debt
+  without direct code inheritance.
+
+Both passes are fully offline. No model is involved. Every edge carries an
+evidence note quoting the context snippet from the source document, so the
+rationale is always traceable.
 
 **`semantic-linker`** then takes those `MENTIONS` edges and asks: which
 repositories share concept overlap? If repo A mentions `knowledge-graph` and
@@ -248,8 +276,9 @@ see at a glance what Dirk newly discovered.
 A deliberate design constraint runs through every phase: **Dirk should work
 without a network call or a hosted model**.
 
-- `concept-extractor` and `semantic-linker` are fully offline. They use
-  frequency analysis and set intersection, not embeddings or LLM calls.
+- `concept-extractor`, `origin-tracer`, and `semantic-linker` are fully offline.
+  They use frequency analysis, heading recognition, keyword matching, and set
+  intersection — not embeddings or LLM calls.
 - `connection-curator` defaults to heuristic mode. Ollama support is opt-in.
 - `repo-inventory` enriches from GitHub when authenticated, but falls back to
   what it can read from local checkouts.
@@ -316,6 +345,11 @@ The output of a run over a real collection of repositories might reveal:
   mentions — suggesting their authors are solving similar problems in isolation.
 - A CLI tool repo that exposes exactly the interface a pipeline repo is
   documented to consume — suggesting they should be formally linked.
+- A repo whose README says "this evolved from my earlier prototype" — surfacing
+  an explicit ancestry link to a sibling repository.
+- A repo with a `## Why` section explaining the problem it was built to solve —
+  providing the human context that makes every other connection in the graph
+  make sense.
 
 None of these connections are invented by Dirk. They exist in the code and
 documentation already. Dirk just reads carefully and writes it all down.
@@ -327,3 +361,4 @@ documentation already. Dirk just reads carefully and writes it all down.
 - [README](../../README.md) — installation, quick start, configuration reference
 - [PHASES.md](../PHASES.md) — current implementation status and roadmap
 - [ADR-0001: Triple Store Storage](../adr/ADR-0001-triple-store-storage.md) — why the graph uses a triple store instead of nodes+edges tables
+- [ADR-0002: Origin Tracer — Conceptual Genesis and Learning Lineage](../adr/ADR-0002-origin-tracer-conceptual-genesis.md) — why and how `origin_tracer` captures the human story behind each repository

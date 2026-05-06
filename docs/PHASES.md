@@ -47,8 +47,12 @@ For conceptual background see [`docs/blog/`](blog/README.md).
   - Detects cross-references to other repos in scope paired with lineage
     keywords (`evolved from`, `inspired by`, etc.) to emit `EVOLVED_FROM` and
     `INSPIRED_BY` edges, capturing learning and evolution lineage.
+  - Optionally enriches the motivation summary via Ollama when
+    `curation.provider: ollama` is configured — the heuristic extract always
+    runs first and Ollama refines it into a single clear sentence.  Falls back
+    to the heuristic text when the model is unavailable.
 - `semantic_linker` emits `SIMILAR_TO` edges from shared concept overlap.
-- This phase is local-first and does not require a hosted model.
+- The heuristic path is local-first and does not require a hosted model.
 
 ### Phase 4
 
@@ -56,7 +60,7 @@ For conceptual background see [`docs/blog/`](blog/README.md).
   heuristics:
   - shared direct edge kinds
   - shared `Technology` / `Interface` neighbors
-- Optional Ollama support can:
+- Optional Ollama support (shared `curation.*` config with `origin_tracer`) can:
   - accept or reject candidate pairs
   - adjust confidence
   - add rationale text and supporting signals into edge evidence

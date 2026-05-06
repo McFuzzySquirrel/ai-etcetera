@@ -1,43 +1,34 @@
--- Dirk knowledge-graph schema.
+-- Dirk knowledge-graph schema v2: triple store.
 --
--- A simple, diffable node/edge model in SQLite. Every edge carries
--- confidence and an evidence trail so the agent can show *why* it thinks
--- two things are connected.
+-- Everything — node properties AND relationships — lives in a single
+-- triples table keyed on (subject, predicate, object).  Property
+-- predicates (e.g. "rdf:type", "name") store scalar string objects;
+-- relationship predicates (e.g. DEPENDS_ON, MENTIONS) store the
+-- destination node id as the object.  This unified model makes the graph
+-- fully diffable without separate node and edge tables.
 
-CREATE TABLE IF NOT EXISTS nodes (
-    id            TEXT PRIMARY KEY,            -- stable id, e.g. "repo:owner/name" or "concept:nlp"
-    kind          TEXT NOT NULL,               -- Repo | Concept | Technology | Interface | Person | Domain | Artifact
-    name          TEXT NOT NULL,               -- human-readable label
-    properties    TEXT NOT NULL DEFAULT '{}',  -- JSON blob for kind-specific fields
-    first_seen    TEXT NOT NULL,               -- ISO8601 UTC
-    last_seen     TEXT NOT NULL                -- ISO8601 UTC
+CREATE TABLE IF NOT EXISTS triples (
+    id            INTEGER PRIMARY KEY AUTOINCREMENT,
+    subject       TEXT NOT NULL,               -- stable node id, e.g. "repo:owner/name"
+    predicate     TEXT NOT NULL,               -- "rdf:type" | "name" | EDGE_KINDS | custom property
+    object        TEXT NOT NULL,               -- literal value, JSON, or destination node id
+    confidence    REAL NOT NULL DEFAULT 1.0,   -- 0..1
+    evidence      TEXT NOT NULL DEFAULT '[]',  -- JSON array of {ref, note}
+    discovered_by TEXT NOT NULL DEFAULT 'system',
+    discovered_at TEXT NOT NULL,               -- ISO8601 UTC
+    UNIQUE(subject, predicate, object)
 );
 
-CREATE INDEX IF NOT EXISTS idx_nodes_kind ON nodes(kind);
-CREATE INDEX IF NOT EXISTS idx_nodes_name ON nodes(name);
-
-CREATE TABLE IF NOT EXISTS edges (
-    id              INTEGER PRIMARY KEY AUTOINCREMENT,
-    src             TEXT NOT NULL REFERENCES nodes(id) ON DELETE CASCADE,
-    dst             TEXT NOT NULL REFERENCES nodes(id) ON DELETE CASCADE,
-    kind            TEXT NOT NULL,             -- DEPENDS_ON | MENTIONS | EXPOSES | SIMILAR_TO | COULD_COMPOSE_WITH | AUTHORED_BY | EVOLVED_FROM
-    confidence      REAL NOT NULL DEFAULT 1.0, -- 0..1
-    evidence        TEXT NOT NULL DEFAULT '[]',-- JSON array of {ref, note}
-    discovered_at   TEXT NOT NULL,             -- ISO8601 UTC
-    discovered_by   TEXT NOT NULL,             -- skill name
-    UNIQUE(src, dst, kind)
-);
-
-CREATE INDEX IF NOT EXISTS idx_edges_src   ON edges(src);
-CREATE INDEX IF NOT EXISTS idx_edges_dst   ON edges(dst);
-CREATE INDEX IF NOT EXISTS idx_edges_kind  ON edges(kind);
+CREATE INDEX IF NOT EXISTS idx_triples_subject   ON triples(subject);
+CREATE INDEX IF NOT EXISTS idx_triples_predicate ON triples(predicate);
+CREATE INDEX IF NOT EXISTS idx_triples_object    ON triples(object);
 
 -- Optional embeddings table for the semantic skills (Phase 3+).
 CREATE TABLE IF NOT EXISTS vectors (
-    node_id   TEXT PRIMARY KEY REFERENCES nodes(id) ON DELETE CASCADE,
-    model     TEXT NOT NULL,                   -- which embedding model produced it
-    dim       INTEGER NOT NULL,
-    vector    BLOB NOT NULL,                   -- raw float32s
+    node_id    TEXT PRIMARY KEY,               -- subject id (no FK so triples can be deleted freely)
+    model      TEXT NOT NULL,                  -- which embedding model produced it
+    dim        INTEGER NOT NULL,
+    vector     BLOB NOT NULL,                  -- raw float32s
     updated_at TEXT NOT NULL
 );
 

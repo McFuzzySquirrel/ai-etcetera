@@ -8,6 +8,7 @@
     dirk connect     # run linker + curator skills
     dirk report      # write findings + delta (no graph mutation)
     dirk run --all   # everything in one shot
+    dirk migrate     # one-time migration from v1 (nodes+edges) to v2 (triples)
 """
 
 from __future__ import annotations
@@ -208,6 +209,31 @@ def run(ctx: click.Context, all_skills: bool, only: tuple[str, ...]) -> None:
     else:
         click.echo("Pass --all or --only <skill> ...", err=True)
         sys.exit(2)
+
+
+@main.command("migrate")
+@click.argument("db", type=click.Path(exists=True, dir_okay=False, path_type=Path))
+@click.option(
+    "--output", "-o",
+    type=click.Path(dir_okay=False, path_type=Path),
+    default=None,
+    help="Output path for the migrated database (default: <db>.v2).",
+)
+@click.option(
+    "--replace", is_flag=True,
+    help="Replace the original database with the migrated one after conversion.",
+)
+def migrate_cmd(db: Path, output: Path | None, replace: bool) -> None:
+    """Migrate a v1 graph.db (nodes+edges) to the v2 triple-store schema."""
+    from dirk.migrate import migrate
+    import shutil
+
+    dst = migrate(db, output)
+    if replace and dst != db:
+        shutil.move(str(dst), str(db))
+        click.echo(f"Replaced {db} with migrated v2 database.")
+    else:
+        click.echo(f"Migrated database written to: {dst}")
 
 
 # -- helpers --------------------------------------------------------------

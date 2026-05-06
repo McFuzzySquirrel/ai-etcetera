@@ -3,6 +3,8 @@
 This document reflects the current implementation state of Dirk, not the
 original speculative plan.
 
+For architectural decisions see [`docs/adr/`](adr/README.md).
+
 ## Current phase status
 
 | Phase | Status | Notes |
@@ -21,6 +23,11 @@ original speculative plan.
 - GitHub metadata enrichment is used when authentication is available.
 - The agent can now resolve scope from both `repos.yml` and GitHub discovery
   via `scope.github_user` / `scope.github_org`.
+- **Storage (v2):** the graph store was migrated from a `nodes`+`edges` schema
+  to a single `triples` table (subject–predicate–object).  `Node` and `Edge`
+  types are retained as convenience wrappers; no skill changes were required.
+  See [`docs/adr/ADR-0001-triple-store-storage.md`](adr/ADR-0001-triple-store-storage.md)
+  for the full rationale.  Use `dirk migrate` to upgrade an existing v1 database.
 
 ### Phase 2
 

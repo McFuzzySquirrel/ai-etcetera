@@ -73,15 +73,15 @@ and produces:
 
 - **Storage:** SQLite (`graph/graph.db`) — file-based, diffable, commits cleanly.
   Upgrade path: DuckDB / Kuzu / Neo4j.
-- **Embeddings:** stored alongside concept nodes in a `vectors` table.
 - **Embeddings:** schema/table support exists; runtime embedding generation is optional and can be layered in later.
-- **Schema:**
-  - **Nodes:** `Repo`, `Concept`, `Technology`, `Interface`, `Person`,
-    `Domain`, `Artifact`.
-  - **Edges:** `DEPENDS_ON`, `MENTIONS`, `EXPOSES`, `SIMILAR_TO`,
+- **Schema (v2 — triple store):** every fact is stored as a `(subject, predicate, object)` triple.
+  - **Property predicates:** `rdf:type` (node kind), `name`, `description`, `language`, `ecosystem`, …
+  - **Relationship predicates:** `DEPENDS_ON`, `MENTIONS`, `EXPOSES`, `SIMILAR_TO`,
     `COULD_COMPOSE_WITH`, `AUTHORED_BY`, `EVOLVED_FROM`.
-  - Every edge carries: `confidence` (0–1), `evidence` (source refs),
+  - Every triple carries: `confidence` (0–1), `evidence` (source refs),
     `discovered_at`, `discovered_by`.
+  - See [`docs/adr/ADR-0001-triple-store-storage.md`](docs/adr/ADR-0001-triple-store-storage.md)
+    for the full design rationale.
 
 ## Quick start
 
@@ -141,6 +141,19 @@ Or do it all in one go:
 ```bash
 dirk run --all
 ```
+
+#### Migrating an existing database
+
+If you have a `graph.db` created by an older version of Dirk (v1 schema with
+separate `nodes` and `edges` tables), run the one-time migration before your
+next scan:
+
+```bash
+dirk migrate graph/graph.db --replace
+```
+
+This converts the database in-place to the v2 triple-store schema.
+A backup is recommended before running with `--replace`.
 
 Check local Ollama availability before enabling LLM curation:
 

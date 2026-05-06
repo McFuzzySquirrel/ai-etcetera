@@ -55,6 +55,7 @@ skills:
   dependency_mapper: true
   interface_extractor: true
   concept_extractor: true
+  origin_tracer: true
   semantic_linker: true
   connection_curator: true
 

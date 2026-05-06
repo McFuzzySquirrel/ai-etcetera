@@ -45,6 +45,7 @@ findings documents Dirk produces are essentially the result of asking
 | `Concept` | A recurring domain term extracted from docs (e.g. `knowledge-graph`, `delta-tracking`) |
 | `Interface` | A public surface: HTTP route, CLI command, exported symbol, schema file |
 | `Person` | A repository author or contributor |
+| `Motivation` | The conceptual origin story behind a repo — *why* it was built |
 | `Domain` | A high-level problem area |
 | `Artifact` | A generated output (report, model file, etc.) |
 
@@ -55,10 +56,12 @@ findings documents Dirk produces are essentially the result of asking
 | `DEPENDS_ON` | Repo or entity depends on a Technology |
 | `MENTIONS` | Repo's docs mention a Concept |
 | `EXPOSES` | Repo exposes an Interface |
+| `MOTIVATED_BY` | Repo was built for this purpose (links to a Motivation node) |
+| `EVOLVED_FROM` | Repo is a direct successor or rewrite of another |
+| `INSPIRED_BY` | Repo was influenced or inspired by another (looser than `EVOLVED_FROM`) |
 | `SIMILAR_TO` | Two repos share enough concepts to be semantically related |
 | `COULD_COMPOSE_WITH` | Two repos could be composed into something larger |
 | `AUTHORED_BY` | Repo was written by a Person |
-| `EVOLVED_FROM` | Repo is a successor to another (planned) |
 
 Every edge carries a **confidence score** (0–1) and an **evidence trail** — a
 list of references that say why Dirk believes the edge exists. This makes the

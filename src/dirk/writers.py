@@ -146,7 +146,7 @@ class ReportWriter:
         lines.append("")
 
         # Direct connections
-        direct_kinds = ("DEPENDS_ON", "EXPOSES", "MENTIONS", "AUTHORED_BY")
+        direct_kinds = ("DEPENDS_ON", "EXPOSES", "MENTIONS", "AUTHORED_BY", "MOTIVATED_BY")
         direct_edges = [
             e for k in direct_kinds for e in edges_by_kind.get(k, [])
             if e["confidence"] >= threshold
@@ -161,7 +161,7 @@ class ReportWriter:
         lines.append("")
 
         # Latent connections
-        latent_kinds = ("SIMILAR_TO", "EVOLVED_FROM")
+        latent_kinds = ("SIMILAR_TO", "EVOLVED_FROM", "INSPIRED_BY")
         latent_edges = [
             e for k in latent_kinds for e in edges_by_kind.get(k, [])
             if e["confidence"] >= threshold
@@ -173,6 +173,40 @@ class ReportWriter:
         else:
             for e in sorted(latent_edges, key=lambda x: -x["confidence"]):
                 lines.append(self._fmt_edge(e))
+        lines.append("")
+
+        # Conceptual genesis
+        motivations = nodes_by_kind.get("Motivation", [])
+        lineage_edges = [
+            e for k in ("EVOLVED_FROM", "INSPIRED_BY") for e in edges_by_kind.get(k, [])
+            if e["confidence"] >= threshold
+        ]
+        lines.append(f"## Conceptual genesis ({len(motivations)} origins, {len(lineage_edges)} lineage links)")
+        lines.append("")
+        if not motivations and not lineage_edges:
+            lines.append(
+                "_No conceptual origins or lineage detected yet — add local checkouts to surface why repos were built._"
+            )
+        else:
+            if motivations:
+                lines.append("### Why each repo exists")
+                lines.append("")
+                for m in sorted(motivations, key=lambda n: n.id):
+                    repo_slug = m.properties.get("repo") or m.id.removeprefix("motivation:")
+                    origin_text = m.properties.get("text") or ""
+                    source_ref = m.properties.get("source") or ""
+                    lines.append(f"**{repo_slug}**")
+                    if origin_text:
+                        lines.append(f"> {origin_text}")
+                    if source_ref:
+                        lines.append(f"_Source: `{source_ref}`_")
+                    lines.append("")
+            if lineage_edges:
+                lines.append("### Evolution and inspiration")
+                lines.append("")
+                for e in sorted(lineage_edges, key=lambda x: -x["confidence"]):
+                    lines.append(self._fmt_edge(e))
+                lines.append("")
         lines.append("")
 
         # Suggested compositions

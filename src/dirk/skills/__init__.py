@@ -47,6 +47,7 @@ from dirk.skills.repo_inventory import RepoInventory
 from dirk.skills.dependency_mapper import DependencyMapper
 from dirk.skills.interface_extractor import InterfaceExtractor
 from dirk.skills.concept_extractor import ConceptExtractor
+from dirk.skills.origin_tracer import OriginTracer
 from dirk.skills.semantic_linker import SemanticLinker
 from dirk.skills.connection_curator import ConnectionCurator
 
@@ -56,6 +57,7 @@ SKILL_REGISTRY: dict[str, type] = {
     "dependency_mapper": DependencyMapper,
     "interface_extractor": InterfaceExtractor,
     "concept_extractor": ConceptExtractor,
+    "origin_tracer": OriginTracer,
     "semantic_linker": SemanticLinker,
     "connection_curator": ConnectionCurator,
 }
@@ -67,6 +69,7 @@ SKILL_ORDER: list[str] = [
     "dependency_mapper",
     "interface_extractor",
     "concept_extractor",
+    "origin_tracer",
     "semantic_linker",
     "connection_curator",
 ]

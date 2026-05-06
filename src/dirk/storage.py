@@ -35,7 +35,7 @@ from typing import Any, Iterable, Iterator
 
 # -- predicate vocabulary -----------------------------------------------
 
-NODE_KINDS = {"Repo", "Concept", "Technology", "Interface", "Person", "Domain", "Artifact"}
+NODE_KINDS = {"Repo", "Concept", "Technology", "Interface", "Person", "Domain", "Artifact", "Motivation"}
 EDGE_KINDS = {
     "DEPENDS_ON",
     "MENTIONS",
@@ -44,6 +44,8 @@ EDGE_KINDS = {
     "COULD_COMPOSE_WITH",
     "AUTHORED_BY",
     "EVOLVED_FROM",
+    "MOTIVATED_BY",
+    "INSPIRED_BY",
 }
 
 # Predicates that are intrinsic to every node and managed by upsert_node.

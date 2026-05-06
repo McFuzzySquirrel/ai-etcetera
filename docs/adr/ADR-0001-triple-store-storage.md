@@ -67,7 +67,7 @@ Two classes of predicates coexist in the same table:
 | Class | Examples | Semantics |
 |---|---|---|
 | Property predicates | `rdf:type`, `name`, `description`, `language`, `ecosystem` | `object` is a scalar string or JSON-encoded value |
-| Relationship predicates | `DEPENDS_ON`, `MENTIONS`, `EXPOSES`, `SIMILAR_TO`, `COULD_COMPOSE_WITH`, `AUTHORED_BY`, `EVOLVED_FROM` | `object` is the destination node id |
+| Relationship predicates | `DEPENDS_ON`, `MENTIONS`, `EXPOSES`, `SIMILAR_TO`, `COULD_COMPOSE_WITH`, `AUTHORED_BY`, `EVOLVED_FROM`, `MOTIVATED_BY`, `INSPIRED_BY` | `object` is the destination node id |
 
 `NODE_KINDS` (`Repo`, `Concept`, `Technology`, …) become values of the
 `rdf:type` predicate rather than a column constraint.  `EDGE_KINDS` become

@@ -12,7 +12,7 @@ For conceptual background see [`docs/blog/`](blog/README.md).
 |---|---|---|
 | 1 — Inventory + graph store | Complete | Repo inventory, SQLite storage, graph and findings writers are active. |
 | 2 — Explicit connections | Complete | Dependency and interface extraction are implemented. Coverage depends on local checkouts. |
-| 3 — Latent connections | Complete | `concept_extractor` and `semantic_linker` are implemented with deterministic local-first behavior. |
+| 3 — Latent connections | Complete | `concept_extractor`, `origin_tracer`, and `semantic_linker` are implemented with deterministic local-first behaviour. |
 | 4 — Synthesis / curation | Partial | `connection_curator` is implemented with heuristics by default and optional Ollama-assisted scoring. The full curator CLI and richer rationale model are still pending. |
 | 5 — Delta tracking | Complete | Findings delta is generated between runs. |
 
@@ -41,8 +41,18 @@ For conceptual background see [`docs/blog/`](blog/README.md).
 
 - `concept_extractor` deterministically derives `Concept` nodes and `MENTIONS`
   edges from local README/docs/manifests.
+- `origin_tracer` extracts the conceptual origin story behind each repo:
+  - Scans for `## Why`, `## Motivation`, `## Background` (and similar) sections
+    to create `Motivation` nodes and `MOTIVATED_BY` edges.
+  - Detects cross-references to other repos in scope paired with lineage
+    keywords (`evolved from`, `inspired by`, etc.) to emit `EVOLVED_FROM` and
+    `INSPIRED_BY` edges, capturing learning and evolution lineage.
+  - Optionally enriches the motivation summary via Ollama when
+    `curation.provider: ollama` is configured — the heuristic extract always
+    runs first and Ollama refines it into a single clear sentence.  Falls back
+    to the heuristic text when the model is unavailable.
 - `semantic_linker` emits `SIMILAR_TO` edges from shared concept overlap.
-- This phase is local-first and does not require a hosted model.
+- The heuristic path is local-first and does not require a hosted model.
 
 ### Phase 4
 
@@ -50,7 +60,7 @@ For conceptual background see [`docs/blog/`](blog/README.md).
   heuristics:
   - shared direct edge kinds
   - shared `Technology` / `Interface` neighbors
-- Optional Ollama support can:
+- Optional Ollama support (shared `curation.*` config with `origin_tracer`) can:
   - accept or reject candidate pairs
   - adjust confidence
   - add rationale text and supporting signals into edge evidence
@@ -81,7 +91,6 @@ workflow Dirk still wants.
 - A dedicated rationale field on curated edges instead of storing rationale in
   generic evidence notes.
 - Read-only curator support CLI such as graph neighbor/pair inspection helpers.
-- `EVOLVED_FROM` synthesis.
 - Stronger ranking and pruning of noisy graph state.
 - A clean-state/pruning workflow so removed repos do not linger in the additive
   graph store across runs.

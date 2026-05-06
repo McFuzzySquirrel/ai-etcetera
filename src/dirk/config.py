@@ -97,6 +97,7 @@ class Config:
         "dependency_mapper": True,
         "interface_extractor": True,
         "concept_extractor": True,
+        "origin_tracer": True,
         "semantic_linker": True,
         "connection_curator": True,
     })

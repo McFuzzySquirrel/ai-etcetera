@@ -44,10 +44,15 @@ and produces:
               │                    │                     │
               ▼                    ▼                     ▼
       ┌───────────────┐    ┌───────────────┐     ┌───────────────┐
-      │ concept-      │    │ semantic-     │     │ connection-   │
-      │  extractor    │    │  linker       │     │  curator      │
+      │ concept-      │    │ origin-       │     │ semantic-     │
+      │  extractor    │    │  tracer       │     │  linker       │
       └───────┬───────┘    └───────┬───────┘     └───────┬───────┘
+              │                    │                     │
               └────────────────────┼─────────────────────┘
+                                   ▼
+                        ┌──────────────────────┐
+                        │   connection-curator │  ← optional Ollama layer
+                        └──────────┬───────────┘
                                    ▼
                         ┌──────────────────────┐
                         │     graph-writer     │   →  graph/graph.db
@@ -64,8 +69,9 @@ and produces:
 | `dependency-mapper` | 2 | Explicit edges: package deps, submodules, cross-repo imports, doc/issue references. |
 | `interface-extractor` | 2 | Public surface area: HTTP routes, CLI commands, exported symbols, schema files, event names. |
 | `concept-extractor` | 3 | Deterministically extracts concepts from local READMEs/docs/manifests and emits `Concept` + `MENTIONS` edges with evidence. |
+| `origin-tracer` | 3 | Captures why each repo was built (`Motivation` nodes + `MOTIVATED_BY` edges) and how repos relate historically (`EVOLVED_FROM`, `INSPIRED_BY` edges). Optionally enriches motivation summaries via Ollama. |
 | `semantic-linker` | 3 | Deterministically proposes `SIMILAR_TO` repo links from shared concept mentions (serendipity-scaled threshold). |
-| `connection-curator` | 4 | Synthesises raw edges into ranked, human-readable findings and composition proposals. |
+| `connection-curator` | 4 | Synthesises raw edges into ranked, human-readable findings and composition proposals. Heuristic by default; optionally Ollama-assisted. |
 | `graph-writer` | always | Persists the graph and emits the visual viewer. |
 | `report-writer` | always | Renders findings + delta Markdown. |
 
@@ -77,7 +83,7 @@ and produces:
 - **Schema (v2 — triple store):** every fact is stored as a `(subject, predicate, object)` triple.
   - **Property predicates:** `rdf:type` (node kind), `name`, `description`, `language`, `ecosystem`, …
   - **Relationship predicates:** `DEPENDS_ON`, `MENTIONS`, `EXPOSES`, `SIMILAR_TO`,
-    `COULD_COMPOSE_WITH`, `AUTHORED_BY`, `EVOLVED_FROM`.
+    `COULD_COMPOSE_WITH`, `AUTHORED_BY`, `EVOLVED_FROM`, `MOTIVATED_BY`, `INSPIRED_BY`.
   - Every triple carries: `confidence` (0–1), `evidence` (source refs),
     `discovered_at`, `discovered_by`.
   - See [`docs/adr/ADR-0001-triple-store-storage.md`](docs/adr/ADR-0001-triple-store-storage.md)
@@ -231,10 +237,17 @@ curation:
 ```
 
 > **Model runtime.** Dirk does not require a hosted model to run.
-> `curation.provider: heuristic` remains the default. If you want local LLM
-> synthesis, set `curation.provider: ollama`; Dirk will call your local
-> Ollama server and automatically fall back to heuristic mode when configured
-> with `curation.fallback: heuristic`. No API key is required for local mode.
+> `curation.provider: heuristic` remains the default. When you set
+> `curation.provider: ollama`, two skills can use your local Ollama server:
+>
+> - **`connection-curator`** — uses the model to accept/reject candidate
+>   composition pairs and attach rationale.
+> - **`origin-tracer`** — uses the model to distil the heuristic motivation
+>   excerpt into a single clear sentence.
+>
+> Both skills fall back to their heuristic result automatically when configured
+> with `curation.fallback: heuristic`, so Ollama unavailability never blocks a
+> run. No API key is required for local mode.
 > See [`docs/PHASES.md`](docs/PHASES.md) for roadmap detail.
 
 `repos.yml` is the canonical local-scope file. Each entry is either a plain
@@ -256,7 +269,7 @@ repos:
 |---|---|
 | 1 — Skeleton + repo-inventory + SQLite + trivial findings | ✅ implemented |
 | 2 — Explicit connections (deps + interfaces) + viewer    | ✅ manifest parsing + CLI/schema extraction |
-| 3 — Latent connections (concepts + semantic linker)      | ✅ deterministic local concepts + semantic links implemented |
+| 3 — Latent connections (concepts + semantic linker)      | ✅ deterministic local concepts + semantic links + origin tracing; optional Ollama motivation enrichment |
 | 4 — Synthesis (curator)                                  | 🟡 working heuristic + Ollama-assisted curator; rationale-only evidence today, full curator CLI/workflow still pending |
 | 5 — Delta tracking                                       | ✅ delta tracking on local runs |
 

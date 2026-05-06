@@ -198,6 +198,13 @@ explicit section exists, it falls back to the first substantial paragraph in the
 README, at a lower confidence score. Either way, the result is a human-readable
 statement, in the author's own words, explaining the repo's purpose.
 
+When a local **Ollama** model is configured (`curation.provider: ollama`), the
+skill optionally enriches the extracted motivation text: the raw heuristic
+excerpt is sent to the model, which returns a single-sentence summary that
+replaces the verbose original. The heuristic pass always runs first; the Ollama
+enrichment is a quality layer, not a hard dependency. If the model is
+unavailable, Dirk falls back to the heuristic text automatically.
+
 *Lineage detection.* The skill then scans for cross-references to other repositories
 in scope (by slug or short name) that appear alongside recognised lineage keywords.
 Two strength levels are distinguished:
@@ -276,9 +283,12 @@ see at a glance what Dirk newly discovered.
 A deliberate design constraint runs through every phase: **Dirk should work
 without a network call or a hosted model**.
 
-- `concept-extractor`, `origin-tracer`, and `semantic-linker` are fully offline.
-  They use frequency analysis, heading recognition, keyword matching, and set
-  intersection — not embeddings or LLM calls.
+- `concept-extractor`, `origin-tracer` (heuristic path), and `semantic-linker`
+  are fully offline. They use frequency analysis, heading recognition, keyword
+  matching, and set intersection — not embeddings or LLM calls.
+- `origin-tracer` can optionally use Ollama to enrich motivation summaries when
+  `curation.provider: ollama` is set. Like `connection-curator`, it falls back
+  to the heuristic result if the model is unavailable.
 - `connection-curator` defaults to heuristic mode. Ollama support is opt-in.
 - `repo-inventory` enriches from GitHub when authenticated, but falls back to
   what it can read from local checkouts.

@@ -4,11 +4,13 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
+from unittest.mock import MagicMock
 
 import yaml
 
 from dirk.agent import DirkAgent
 from dirk.config import load_config
+from dirk.ollama import OllamaMotivation
 
 
 # ---------------------------------------------------------------------------
@@ -310,3 +312,156 @@ def test_origin_tracer_no_lineage_without_keyword(tmp_path, monkeypatch):
 
     lineage_edges = [e for e in edges if e.get("kind") in {"EVOLVED_FROM", "INSPIRED_BY"}]
     assert not lineage_edges
+
+
+# ---------------------------------------------------------------------------
+# Ollama enrichment
+# ---------------------------------------------------------------------------
+
+def test_origin_tracer_ollama_enriches_motivation(tmp_path, monkeypatch):
+    """When Ollama is enabled and available, motivation text is enriched by the model."""
+    monkeypatch.delenv("GITHUB_TOKEN", raising=False)
+    monkeypatch.delenv("DIRK_GITHUB_TOKEN", raising=False)
+
+    repo_root = tmp_path / "checkouts" / "rich-app"
+    repo_root.mkdir(parents=True)
+    (repo_root / "README.md").write_text(
+        "\n".join([
+            "# Rich App",
+            "",
+            "## Why",
+            "",
+            "We built this because the old toolkit had too many moving parts.",
+        ]),
+        encoding="utf-8",
+    )
+
+    skills = {
+        "repo_inventory": True,
+        "dependency_mapper": False,
+        "interface_extractor": False,
+        "concept_extractor": False,
+        "origin_tracer": True,
+        "semantic_linker": False,
+        "connection_curator": False,
+    }
+    (tmp_path / "dirk.config.yml").write_text(
+        yaml.safe_dump({
+            "scope": {"source": "repos.yml"},
+            "depth": "quick",
+            "connection_threshold": 0.0,
+            "curation": {
+                "provider": "ollama",
+                "model": "test-model",
+                "base_url": "http://127.0.0.1:11434",
+                "timeout_sec": 10,
+                "fallback": "heuristic",
+            },
+            "skills": skills,
+        }),
+        encoding="utf-8",
+    )
+    (tmp_path / "repos.yml").write_text(
+        yaml.safe_dump({"repos": [{"slug": "acme/rich-app", "path": "checkouts/rich-app"}]}),
+        encoding="utf-8",
+    )
+
+    mock_client = MagicMock()
+    mock_client.health.return_value = (True, "ok")
+    mock_client.enrich_motivation.return_value = OllamaMotivation(
+        summary="Built to replace an over-engineered toolkit with a simpler alternative.",
+        confidence=0.92,
+    )
+
+    monkeypatch.setattr(
+        "dirk.skills.origin_tracer.OllamaClient",
+        lambda **kwargs: mock_client,
+    )
+
+    cfg = load_config(root=tmp_path)
+    summary = DirkAgent(cfg).run(only=["repo_inventory", "origin_tracer"])
+
+    origin_results = [r for r in summary.skill_results if r.skill == "origin_tracer"]
+    assert origin_results
+    assert "ollama enrichment enabled" in origin_results[0].notes
+
+    graph = json.loads((tmp_path / "graph" / "graph.json").read_text(encoding="utf-8"))
+    nodes = {el["data"]["id"]: el["data"] for el in graph["elements"] if "source" not in el["data"]}
+
+    assert "motivation:acme/rich-app" in nodes
+    mot = nodes["motivation:acme/rich-app"]
+    assert mot["text"] == "Built to replace an over-engineered toolkit with a simpler alternative."
+
+    mock_client.enrich_motivation.assert_called_once()
+
+
+def test_origin_tracer_ollama_falls_back_on_health_fail(tmp_path, monkeypatch):
+    """When Ollama health check fails, heuristic motivation text is used without error."""
+    monkeypatch.delenv("GITHUB_TOKEN", raising=False)
+    monkeypatch.delenv("DIRK_GITHUB_TOKEN", raising=False)
+
+    repo_root = tmp_path / "checkouts" / "fallback-app"
+    repo_root.mkdir(parents=True)
+    (repo_root / "README.md").write_text(
+        "\n".join([
+            "# Fallback App",
+            "",
+            "## Motivation",
+            "",
+            "Needed a simpler way to manage configuration files across environments.",
+        ]),
+        encoding="utf-8",
+    )
+
+    skills = {
+        "repo_inventory": True,
+        "dependency_mapper": False,
+        "interface_extractor": False,
+        "concept_extractor": False,
+        "origin_tracer": True,
+        "semantic_linker": False,
+        "connection_curator": False,
+    }
+    (tmp_path / "dirk.config.yml").write_text(
+        yaml.safe_dump({
+            "scope": {"source": "repos.yml"},
+            "depth": "quick",
+            "connection_threshold": 0.0,
+            "curation": {
+                "provider": "ollama",
+                "model": "test-model",
+                "base_url": "http://127.0.0.1:11434",
+                "timeout_sec": 10,
+                "fallback": "heuristic",
+            },
+            "skills": skills,
+        }),
+        encoding="utf-8",
+    )
+    (tmp_path / "repos.yml").write_text(
+        yaml.safe_dump({"repos": [{"slug": "acme/fallback-app", "path": "checkouts/fallback-app"}]}),
+        encoding="utf-8",
+    )
+
+    mock_client = MagicMock()
+    mock_client.health.return_value = (False, "model not found")
+
+    monkeypatch.setattr(
+        "dirk.skills.origin_tracer.OllamaClient",
+        lambda **kwargs: mock_client,
+    )
+
+    cfg = load_config(root=tmp_path)
+    summary = DirkAgent(cfg).run(only=["repo_inventory", "origin_tracer"])
+
+    origin_results = [r for r in summary.skill_results if r.skill == "origin_tracer"]
+    assert origin_results
+    assert "ollama unavailable" in origin_results[0].notes
+
+    # Motivation node must still be created from heuristic extraction.
+    graph = json.loads((tmp_path / "graph" / "graph.json").read_text(encoding="utf-8"))
+    nodes = {el["data"]["id"]: el["data"] for el in graph["elements"] if "source" not in el["data"]}
+    assert "motivation:acme/fallback-app" in nodes
+
+    # enrich_motivation must never have been called.
+    mock_client.enrich_motivation.assert_not_called()

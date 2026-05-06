@@ -1,4 +1,4 @@
-"""Local Ollama client used by curation.
+"""Local Ollama client used by curation and origin tracing.
 
 The client is intentionally small and deterministic:
 - temperature=0
@@ -23,6 +23,12 @@ class OllamaSuggestion:
     supporting_signals: list[str]
 
 
+@dataclass
+class OllamaMotivation:
+    summary: str
+    confidence: float
+
+
 class OllamaClient:
     def __init__(self, *, base_url: str, model: str, timeout_sec: int = 45):
         self.base_url = base_url.rstrip("/")
@@ -43,6 +49,63 @@ class OllamaClient:
         if self.model not in names:
             return False, f"model '{self.model}' not found (ollama pull {self.model})"
         return True, "ok"
+
+    def enrich_motivation(
+        self,
+        *,
+        repo: str,
+        excerpt: str,
+    ) -> OllamaMotivation | None:
+        system = (
+            "You are a strict JSON API. Given a README excerpt for a software repository, "
+            "summarise in a single sentence (max 200 characters) why the repository was built. "
+            "Respond ONLY valid JSON with keys: "
+            "summary (string, ≤200 chars), confidence (0..1 float)."
+        )
+        user = {
+            "repo": repo,
+            "excerpt": excerpt[:400],
+            "instruction": "Focus on purpose and motivation, not features.",
+        }
+        payload = {
+            "model": self.model,
+            "stream": False,
+            "format": "json",
+            "options": {"temperature": 0},
+            "messages": [
+                {"role": "system", "content": system},
+                {"role": "user", "content": json.dumps(user, sort_keys=True)},
+            ],
+        }
+        response = self._post_json("/api/chat", payload)
+        if not isinstance(response, dict):
+            return None
+        message = response.get("message")
+        if not isinstance(message, dict):
+            return None
+        content = message.get("content")
+        if not isinstance(content, str) or not content.strip():
+            return None
+
+        try:
+            parsed = json.loads(content)
+        except json.JSONDecodeError:
+            return None
+        if not isinstance(parsed, dict):
+            return None
+
+        summary = parsed.get("summary")
+        if not isinstance(summary, str) or not summary.strip():
+            return None
+        summary = summary.strip()[:200]
+
+        try:
+            confidence = float(parsed.get("confidence", 0.0))
+        except (TypeError, ValueError):
+            confidence = 0.0
+        confidence = max(0.0, min(1.0, confidence))
+
+        return OllamaMotivation(summary=summary, confidence=confidence)
 
     def curate_pair(
         self,

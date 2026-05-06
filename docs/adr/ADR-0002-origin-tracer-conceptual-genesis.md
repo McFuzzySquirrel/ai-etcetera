@@ -49,8 +49,9 @@ in `EDGE_KINDS` as a placeholder but was never populated.
 ## Decision
 
 Add a new Phase 3 skill — `origin_tracer` — that runs after `concept_extractor`
-and before `semantic_linker`.  The skill works entirely from local file content,
-requires no network, and never calls a model.
+and before `semantic_linker`.  The skill is built on a deterministic local
+foundation (no network, no model required) with an optional Ollama enrichment
+layer that activates when `curation.provider = ollama` is set in the config.
 
 ### 1. Motivation extraction
 
@@ -126,7 +127,37 @@ One new entry added to `NODE_KINDS`:
 |---|---|
 | `Motivation` | The captured origin story of a repository |
 
-### 4. Report changes
+### 4. Optional Ollama motivation enrichment
+
+When `curation.provider = ollama` is configured, `origin_tracer` reuses the
+same `OllamaClient` already used by `connection_curator` (same `base_url`,
+`model`, `timeout_sec`, and `fallback` settings — no new config keys).
+
+**Enrichment flow:**
+
+1. The heuristic extraction always runs first and produces a raw motivation
+   statement.
+2. If Ollama is configured, `OllamaClient.health()` is called once per run.
+   - If healthy: `enrich_motivation(repo, excerpt)` is called for each repo
+     that has a heuristic motivation.  The model receives the repo slug and the
+     raw excerpt and returns a single-sentence summary (≤ 200 characters) and a
+     confidence score as JSON.
+   - If unhealthy and `fallback = heuristic`: the heuristic text is stored as-is
+     and a note is added to the skill result.
+   - If unhealthy and `fallback = fail`: a `RuntimeError` is raised.
+3. When enrichment succeeds, the `text` property on the `Motivation` node is
+   replaced by the model-produced summary.  The `MOTIVATED_BY` edge's confidence
+   is updated to `max(heuristic_confidence, ollama_confidence)`.  An additional
+   evidence item is appended: `{"ref": "ollama:{model}", "note": "motivation
+   enriched by LLM"}`.
+4. When enrichment fails at request time (network/timeout), the same fallback
+   policy applies as for health check failure.
+
+The heuristic result is **always computed before the Ollama call**.  Ollama is
+a quality enhancement layer, not a hard dependency.  The graph is always
+populated even when a model is unavailable.
+
+### 5. Report changes
 
 The findings document gains a **"Conceptual genesis"** section that renders:
 
@@ -138,7 +169,7 @@ The findings document gains a **"Conceptual genesis"** section that renders:
 `MOTIVATED_BY` is added to the direct-connections section; `INSPIRED_BY` is
 added to the latent-connections section.
 
-### 5. Pipeline position
+### 6. Pipeline position
 
 ```
 Phase 3 ──── concept_extractor   (Concept nodes + MENTIONS edges)
@@ -165,10 +196,11 @@ established.  It runs before `semantic_linker` so that `INSPIRED_BY` and
   created and trace its intellectual ancestry.
 - **Lineage edges are evidence-backed.**  Every `EVOLVED_FROM` and `INSPIRED_BY`
   edge carries an evidence note quoting the context snippet from the source file.
-- **Zero new runtime dependencies.**  The skill uses only `re` and `pathlib`
-  from the standard library.
-- **Fully offline.**  No model, no API, no embeddings — consistent with the
-  local-first design constraint.
+- **Zero new runtime dependencies.**  The heuristic path uses only `re` and
+  `pathlib` from the standard library.  The Ollama path reuses the
+  `OllamaClient` already present in the codebase — no new library is needed.
+- **Fully offline by default.**  No model, no API, no embeddings — consistent
+  with the local-first design constraint.  Ollama enrichment is opt-in.
 - **Additive and graceful.**  Repos without a detectable origin story simply
   produce no `Motivation` node.  Repos with no cross-references produce no
   lineage edges.  The skill never raises an error for sparse input.
@@ -195,8 +227,8 @@ established.  It runs before `semantic_linker` so that `INSPIRED_BY` and
 
 ### Neutral
 
-- All existing tests pass unchanged; the 37-test suite grew by 7 new tests
-  specific to `origin_tracer`.
+- All existing tests pass unchanged; the 37-test suite grew by 9 new tests
+  specific to `origin_tracer` (7 heuristic path, 2 Ollama path).
 - The skills pipeline order in `SKILL_ORDER` is updated; existing consumers of
   `SKILL_ORDER` are unaffected because the list is only iterated, never indexed
   by position.
@@ -223,20 +255,25 @@ Rejected because:
    the `MENTIONS` edge carries confidence and evidence.  `Motivation` follows
    the same pattern with `MOTIVATED_BY`.
 
-### Use an LLM to classify motivation
+### Use an LLM to replace heuristic extraction entirely
 
-Ask Ollama (or a hosted model) to read each README and return a structured
-motivation statement.
+Ask Ollama to read each README cold and return a motivation statement, without
+any heuristic pre-pass.
 
-Rejected for this first implementation because:
-1. It breaks the local-first, zero-dependency constraint.
-2. Deterministic regex-and-heading extraction is fully testable, reproducible,
-   and CI-safe.  LLM output is non-deterministic.
-3. The heading-based approach captures the author's own words, which are more
-   trustworthy than a model paraphrase.
+Rejected because:
+1. LLM output is non-deterministic: the same README can produce slightly
+   different summaries on different runs, making diffs harder to interpret.
+2. A model call is a network round-trip with a real failure mode.  The
+   heuristic-first design means Dirk always produces a result, regardless
+   of model availability.
+3. The heading-based approach captures the author's own words verbatim when a
+   good `## Why` section exists — these are more trustworthy than a model
+   paraphrase.
 
-An LLM-assisted enhancement layer (similar to how `connection_curator` can use
-Ollama) could be added in a future iteration without breaking the current design.
+The implemented approach combines both: heuristics first, Ollama as an
+*optional refinement* when a model is available (same fallback logic as
+`connection_curator`).  This gives the best of both worlds: reproducible
+baseline plus quality uplift when configured.
 
 ### Infer lineage from git history (`git log --follow`)
 

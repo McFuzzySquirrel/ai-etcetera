@@ -23,6 +23,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Iterator
 
+from dirk.ollama import OllamaClient
 from dirk.skills import SkillContext, SkillResult
 from dirk.storage import Edge, Node
 
@@ -79,6 +80,25 @@ class OriginTracer:
 
         slug_pattern = _build_slug_pattern(all_slugs, short_to_slug)
 
+        # Optional Ollama enrichment — same provider/model as connection_curator.
+        llm_client: OllamaClient | None = None
+        notes: list[str] = []
+        use_llm = ctx.config.curation.provider == "ollama"
+        if use_llm:
+            llm_client = OllamaClient(
+                base_url=ctx.config.curation.base_url,
+                model=ctx.config.curation.model,
+                timeout_sec=ctx.config.curation.timeout_sec,
+            )
+            ok, reason = llm_client.health()
+            if not ok:
+                if ctx.config.curation.fallback == "fail":
+                    raise RuntimeError(f"Ollama origin enrichment unavailable: {reason}")
+                notes.append(f"ollama unavailable ({reason}); used heuristic extraction")
+                llm_client = None
+            else:
+                notes.append(f"ollama enrichment enabled ({ctx.config.curation.model})")
+
         scanned_motivation = 0
         scanned_lineage = 0
 
@@ -97,12 +117,44 @@ class OriginTracer:
                 motivation = _extract_motivation(texts)
                 if motivation:
                     mot_id = f"motivation:{source.slug}"
+                    text = motivation["text"]
+                    confidence = motivation["confidence"]
+                    evidence: list[dict] = [{
+                        "ref": motivation["source"],
+                        "note": f"motivation extracted from {motivation['source']}",
+                    }]
+
+                    # Optionally enrich with Ollama.
+                    if llm_client is not None:
+                        try:
+                            enriched = llm_client.enrich_motivation(
+                                repo=source.slug,
+                                excerpt=text,
+                            )
+                        except Exception as exc:  # pragma: no cover - network/runtime guard
+                            if ctx.config.curation.fallback == "fail":
+                                raise RuntimeError(
+                                    f"ollama motivation enrichment failed: {exc}"
+                                ) from exc
+                            notes.append(
+                                f"ollama request failed ({exc}); used heuristic extraction"
+                            )
+                            llm_client = None
+                            enriched = None
+                        if enriched is not None and enriched.summary:
+                            text = enriched.summary
+                            confidence = max(confidence, enriched.confidence)
+                            evidence.append({
+                                "ref": f"ollama:{ctx.config.curation.model}",
+                                "note": "motivation enriched by LLM",
+                            })
+
                     ctx.store.upsert_node(Node(
                         id=mot_id,
                         kind="Motivation",
                         name=f"{source.name} — why",
                         properties={
-                            "text": motivation["text"],
+                            "text": text,
                             "source": motivation["source"],
                             "repo": source.slug,
                         },
@@ -111,11 +163,8 @@ class OriginTracer:
                         src=repo_id,
                         dst=mot_id,
                         kind="MOTIVATED_BY",
-                        confidence=motivation["confidence"],
-                        evidence=[{
-                            "ref": motivation["source"],
-                            "note": f"motivation extracted from {motivation['source']}",
-                        }],
+                        confidence=confidence,
+                        evidence=evidence,
                         discovered_by=self.name,
                     ))
                     scanned_motivation += 1
@@ -125,20 +174,20 @@ class OriginTracer:
                     continue
 
                 full_text = "\n".join(text for _, text in texts)
-                for other_slug, edge_kind, confidence, context_note in _find_lineage(
+                for other_slug, edge_kind, edge_confidence, context_note in _find_lineage(
                     full_text, source.slug, all_slugs, short_to_slug, slug_pattern
                 ):
                     ctx.store.upsert_edge(Edge(
                         src=repo_id,
                         dst=f"repo:{other_slug}",
                         kind=edge_kind,
-                        confidence=confidence,
+                        confidence=edge_confidence,
                         evidence=[{"ref": "README/docs", "note": context_note}],
                         discovered_by=self.name,
                     ))
                     scanned_lineage += 1
 
-        notes_parts: list[str] = []
+        notes_parts: list[str] = list(notes)
         if scanned_motivation:
             notes_parts.append(f"extracted motivation from {scanned_motivation} repo(s)")
         if scanned_lineage:

@@ -1,8 +1,24 @@
 """SQLite-backed knowledge-graph storage for Dirk.
 
-The store is intentionally simple: nodes + edges + optional embeddings.
-Every mutation goes through this layer so the graph stays consistent and
-runs are reproducible / diffable.
+The store is intentionally simple: a single ``triples`` table holds both
+node properties and relationships as ``(subject, predicate, object)``
+statements.  Every mutation goes through this layer so the graph stays
+consistent and runs are reproducible / diffable.
+
+Public API
+----------
+* :class:`Triple` — the atomic storage unit.
+* :class:`Node` / :class:`Edge` — convenience types kept for compatibility;
+  ``upsert_node`` fans out to multiple triples, ``upsert_edge`` emits one.
+* :class:`GraphStore` — the main interface.
+
+Predicate vocabulary
+--------------------
+* ``"rdf:type"`` — node kind (Repo, Concept, …).
+* ``"name"``     — human-readable label.
+* Any other non-EDGE_KINDS predicate — arbitrary node property.
+* Any predicate in ``EDGE_KINDS`` — a directed relationship whose ``object``
+  is the destination node id.
 """
 
 from __future__ import annotations
@@ -17,7 +33,7 @@ from pathlib import Path
 from typing import Any, Iterable, Iterator
 
 
-# -- node / edge types ---------------------------------------------------
+# -- predicate vocabulary -----------------------------------------------
 
 NODE_KINDS = {"Repo", "Concept", "Technology", "Interface", "Person", "Domain", "Artifact"}
 EDGE_KINDS = {
@@ -30,13 +46,31 @@ EDGE_KINDS = {
     "EVOLVED_FROM",
 }
 
+# Predicates that are intrinsic to every node and managed by upsert_node.
+_NODE_CORE_PREDICATES = {"rdf:type", "name"}
+
 
 def utcnow_iso() -> str:
     return datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
 
 
+# -- data classes --------------------------------------------------------
+
+@dataclass
+class Triple:
+    """Atomic triple: (subject, predicate, object) plus provenance."""
+    subject: str
+    predicate: str
+    object: str
+    confidence: float = 1.0
+    evidence: list[dict[str, str]] = field(default_factory=list)
+    discovered_by: str = "system"
+    discovered_at: str = field(default_factory=utcnow_iso)
+
+
 @dataclass
 class Node:
+    """Convenience type for node operations; fans out to triples internally."""
     id: str
     kind: str
     name: str
@@ -45,6 +79,7 @@ class Node:
 
 @dataclass
 class Edge:
+    """Convenience type for edge operations; stored as a single triple internally."""
     src: str
     dst: str
     kind: str
@@ -56,7 +91,7 @@ class Edge:
 # -- store ---------------------------------------------------------------
 
 class GraphStore:
-    """Thin wrapper around SQLite with the Dirk schema applied."""
+    """Thin wrapper around SQLite with the Dirk triple-store schema applied."""
 
     def __init__(self, path: str | Path):
         self.path = Path(path)
@@ -93,109 +128,213 @@ class GraphStore:
             self._conn.rollback()
             raise
 
-    # -- nodes -----------------------------------------------------------
+    # -- triples (low-level) ---------------------------------------------
+
+    def upsert_triple(self, triple: Triple) -> bool:
+        """Insert or update a triple.
+
+        * For **relationship** predicates (those in ``EDGE_KINDS``): the
+          uniqueness key is ``(subject, predicate, object)``.  On conflict
+          the confidence is raised to the maximum and evidence lists are
+          merged (de-duplicated).
+        * For **property** predicates (everything else): the uniqueness key
+          is effectively ``(subject, predicate)`` — any existing triple for
+          the same subject/predicate is deleted before the new one is
+          inserted, ensuring each subject carries at most one value per
+          property predicate.
+
+        Returns ``True`` if a new row was created, ``False`` otherwise.
+        """
+        now = triple.discovered_at or utcnow_iso()
+
+        if triple.predicate in EDGE_KINDS:
+            # Relationship triple: merge evidence on conflict.
+            existing = self._conn.execute(
+                "SELECT id, confidence, evidence FROM triples "
+                "WHERE subject = ? AND predicate = ? AND object = ?",
+                (triple.subject, triple.predicate, triple.object),
+            ).fetchone()
+            if existing is None:
+                self._conn.execute(
+                    "INSERT INTO triples"
+                    "(subject, predicate, object, confidence, evidence, discovered_by, discovered_at) "
+                    "VALUES (?, ?, ?, ?, ?, ?, ?)",
+                    (
+                        triple.subject,
+                        triple.predicate,
+                        triple.object,
+                        triple.confidence,
+                        json.dumps(triple.evidence, sort_keys=True),
+                        triple.discovered_by,
+                        now,
+                    ),
+                )
+                return True
+            # Merge: take max confidence, append new evidence (de-duplicated).
+            prior_evidence = json.loads(existing["evidence"] or "[]")
+            merged: list[dict[str, str]] = list(prior_evidence)
+            seen = {(e.get("ref"), e.get("note")) for e in merged}
+            for ev in triple.evidence:
+                key = (ev.get("ref"), ev.get("note"))
+                if key not in seen:
+                    merged.append(ev)
+                    seen.add(key)
+            new_conf = max(float(existing["confidence"]), triple.confidence)
+            self._conn.execute(
+                "UPDATE triples SET confidence = ?, evidence = ? WHERE id = ?",
+                (new_conf, json.dumps(merged, sort_keys=True), existing["id"]),
+            )
+            return False
+
+        # Property triple: replace any existing value for this subject+predicate.
+        self._conn.execute(
+            "DELETE FROM triples WHERE subject = ? AND predicate = ?",
+            (triple.subject, triple.predicate),
+        )
+        self._conn.execute(
+            "INSERT INTO triples"
+            "(subject, predicate, object, confidence, evidence, discovered_by, discovered_at) "
+            "VALUES (?, ?, ?, ?, ?, ?, ?)",
+            (
+                triple.subject,
+                triple.predicate,
+                triple.object,
+                triple.confidence,
+                json.dumps(triple.evidence, sort_keys=True),
+                triple.discovered_by,
+                now,
+            ),
+        )
+        return True
+
+    # -- nodes (convenience layer) ----------------------------------------
 
     def upsert_node(self, node: Node) -> bool:
-        """Insert or update a node. Returns True if newly inserted."""
+        """Insert or update a node.
+
+        Fans out to one ``rdf:type`` triple, one ``name`` triple, and one
+        triple per extra property.  Returns ``True`` if the node is new
+        (i.e. no ``rdf:type`` triple existed for this subject yet).
+        """
         if node.kind not in NODE_KINDS:
             raise ValueError(f"Unknown node kind: {node.kind!r}")
         now = utcnow_iso()
-        cur = self._conn.execute("SELECT id FROM nodes WHERE id = ?", (node.id,))
-        existing = cur.fetchone()
-        props_json = json.dumps(node.properties, sort_keys=True)
-        if existing is None:
-            self._conn.execute(
-                "INSERT INTO nodes(id, kind, name, properties, first_seen, last_seen) "
-                "VALUES (?, ?, ?, ?, ?, ?)",
-                (node.id, node.kind, node.name, props_json, now, now),
-            )
+
+        # Determine whether this subject already exists.
+        existing = self._conn.execute(
+            "SELECT 1 FROM triples WHERE subject = ? AND predicate = 'rdf:type'",
+            (node.id,),
+        ).fetchone()
+        is_new = existing is None
+
+        # Core triples: type and name (property semantics — replace on update).
+        self.upsert_triple(Triple(
+            subject=node.id, predicate="rdf:type", object=node.kind,
+            discovered_by="system", discovered_at=now,
+        ))
+        self.upsert_triple(Triple(
+            subject=node.id, predicate="name", object=node.name,
+            discovered_by="system", discovered_at=now,
+        ))
+
+        # Extra property triples.
+        for key, value in node.properties.items():
+            val_str = json.dumps(value, sort_keys=True) if not isinstance(value, str) else value
+            self.upsert_triple(Triple(
+                subject=node.id, predicate=key, object=val_str,
+                discovered_by="system", discovered_at=now,
+            ))
+
+        if is_new:
             self.nodes_added += 1
-            return True
-        self._conn.execute(
-            "UPDATE nodes SET name = ?, properties = ?, last_seen = ? WHERE id = ?",
-            (node.name, props_json, now, node.id),
-        )
-        return False
+        return is_new
 
     def get_node(self, node_id: str) -> Node | None:
-        row = self._conn.execute("SELECT * FROM nodes WHERE id = ?", (node_id,)).fetchone()
-        if row is None:
+        """Reconstruct a :class:`Node` from all property triples for *node_id*."""
+        rows = self._conn.execute(
+            "SELECT predicate, object FROM triples WHERE subject = ?",
+            (node_id,),
+        ).fetchall()
+        kind: str | None = None
+        name: str | None = None
+        properties: dict[str, Any] = {}
+        for pred, obj in rows:
+            if pred == "rdf:type":
+                kind = obj
+            elif pred == "name":
+                name = obj
+            elif pred not in EDGE_KINDS:
+                try:
+                    properties[pred] = json.loads(obj)
+                except (json.JSONDecodeError, ValueError):
+                    properties[pred] = obj
+        if kind is None or name is None:
             return None
-        return Node(
-            id=row["id"],
-            kind=row["kind"],
-            name=row["name"],
-            properties=json.loads(row["properties"] or "{}"),
-        )
+        return Node(id=node_id, kind=kind, name=name, properties=properties)
 
     def iter_nodes(self, kind: str | None = None) -> Iterator[Node]:
+        """Iterate over nodes, optionally filtered by kind."""
         if kind:
-            rows = self._conn.execute("SELECT * FROM nodes WHERE kind = ? ORDER BY id", (kind,))
+            rows = self._conn.execute(
+                "SELECT subject FROM triples "
+                "WHERE predicate = 'rdf:type' AND object = ? ORDER BY subject",
+                (kind,),
+            ).fetchall()
         else:
-            rows = self._conn.execute("SELECT * FROM nodes ORDER BY kind, id")
-        for row in rows:
-            yield Node(
-                id=row["id"],
-                kind=row["kind"],
-                name=row["name"],
-                properties=json.loads(row["properties"] or "{}"),
-            )
+            rows = self._conn.execute(
+                "SELECT subject FROM triples "
+                "WHERE predicate = 'rdf:type' ORDER BY object, subject"
+            ).fetchall()
+        for (subject,) in rows:
+            node = self.get_node(subject)
+            if node is not None:
+                yield node
 
-    # -- edges -----------------------------------------------------------
+    # -- edges (convenience layer) ----------------------------------------
 
     def upsert_edge(self, edge: Edge) -> bool:
-        """Insert a new edge, or merge evidence into an existing one."""
+        """Insert a new edge, or merge evidence into an existing one.
+
+        Stored as a single triple ``(src, kind, dst)``.
+        Returns ``True`` if a new edge was created.
+        """
         if edge.kind not in EDGE_KINDS:
             raise ValueError(f"Unknown edge kind: {edge.kind!r}")
         if not 0.0 <= edge.confidence <= 1.0:
             raise ValueError("confidence must be in [0, 1]")
-        now = utcnow_iso()
-        existing = self._conn.execute(
-            "SELECT id, confidence, evidence FROM edges WHERE src = ? AND dst = ? AND kind = ?",
-            (edge.src, edge.dst, edge.kind),
-        ).fetchone()
-        if existing is None:
-            self._conn.execute(
-                "INSERT INTO edges(src, dst, kind, confidence, evidence, discovered_at, discovered_by) "
-                "VALUES (?, ?, ?, ?, ?, ?, ?)",
-                (
-                    edge.src,
-                    edge.dst,
-                    edge.kind,
-                    edge.confidence,
-                    json.dumps(edge.evidence, sort_keys=True),
-                    now,
-                    edge.discovered_by,
-                ),
-            )
-            self.edges_added += 1
-            return True
-        # Merge: take max confidence, append new evidence (de-duplicated).
-        prior_evidence = json.loads(existing["evidence"] or "[]")
-        merged: list[dict[str, str]] = list(prior_evidence)
-        seen = {(e.get("ref"), e.get("note")) for e in merged}
-        for ev in edge.evidence:
-            key = (ev.get("ref"), ev.get("note"))
-            if key not in seen:
-                merged.append(ev)
-                seen.add(key)
-        new_conf = max(float(existing["confidence"]), edge.confidence)
-        self._conn.execute(
-            "UPDATE edges SET confidence = ?, evidence = ? WHERE id = ?",
-            (new_conf, json.dumps(merged, sort_keys=True), existing["id"]),
+        triple = Triple(
+            subject=edge.src,
+            predicate=edge.kind,
+            object=edge.dst,
+            confidence=edge.confidence,
+            evidence=edge.evidence,
+            discovered_by=edge.discovered_by,
+            discovered_at=utcnow_iso(),
         )
-        return False
+        is_new = self.upsert_triple(triple)
+        if is_new:
+            self.edges_added += 1
+        return is_new
 
     def iter_edges(self, kind: str | None = None) -> Iterator[dict[str, Any]]:
+        """Iterate over relationship triples as edge dicts."""
         if kind:
-            rows = self._conn.execute("SELECT * FROM edges WHERE kind = ? ORDER BY src, dst", (kind,))
+            rows = self._conn.execute(
+                "SELECT * FROM triples WHERE predicate = ? ORDER BY subject, object",
+                (kind,),
+            )
         else:
-            rows = self._conn.execute("SELECT * FROM edges ORDER BY kind, src, dst")
+            placeholders = ", ".join("?" * len(EDGE_KINDS))
+            rows = self._conn.execute(
+                f"SELECT * FROM triples "
+                f"WHERE predicate IN ({placeholders}) ORDER BY predicate, subject, object",
+                tuple(sorted(EDGE_KINDS)),
+            )
         for row in rows:
             yield {
-                "src": row["src"],
-                "dst": row["dst"],
-                "kind": row["kind"],
+                "src": row["subject"],
+                "dst": row["object"],
+                "kind": row["predicate"],
                 "confidence": row["confidence"],
                 "evidence": json.loads(row["evidence"] or "[]"),
                 "discovered_at": row["discovered_at"],
@@ -229,9 +368,7 @@ class GraphStore:
 
     def to_cytoscape(self) -> dict[str, Any]:
         """Export the graph as a Cytoscape.js-compatible JSON document."""
-        # Cytoscape treats ``data.source`` / ``data.target`` as edge markers,
-        # and ``data.id`` / ``data.kind`` / ``data.label`` are structural.
-        # Strip those keys from node properties before merging so a property
+        # Strip reserved Cytoscape keys from node properties so a property
         # name collision can never corrupt the export.
         reserved = {"id", "label", "kind", "source", "target"}
         elements: list[dict[str, Any]] = []

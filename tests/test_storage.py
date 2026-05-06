@@ -2,8 +2,75 @@
 
 from __future__ import annotations
 
-from dirk.storage import Edge, GraphStore, Node
+import json
 
+from dirk.storage import Edge, GraphStore, Node, Triple
+
+
+# -- Triple / upsert_triple tests ----------------------------------------
+
+def test_upsert_triple_property_replaces_old_value(tmp_path):
+    """Property triples (non-edge predicates) overwrite the previous value."""
+    db = tmp_path / "graph.db"
+    with GraphStore(db) as store:
+        t1 = Triple(subject="repo:o/a", predicate="name", object="old name")
+        assert store.upsert_triple(t1)  # newly inserted
+
+        t2 = Triple(subject="repo:o/a", predicate="name", object="new name")
+        store.upsert_triple(t2)  # should replace, not append
+
+        rows = store._conn.execute(
+            "SELECT object FROM triples WHERE subject = ? AND predicate = ?",
+            ("repo:o/a", "name"),
+        ).fetchall()
+        assert len(rows) == 1
+        assert rows[0][0] == "new name"
+
+
+def test_upsert_triple_edge_merges_evidence(tmp_path):
+    """Relationship triples merge evidence and take max confidence on conflict."""
+    db = tmp_path / "graph.db"
+    with GraphStore(db) as store:
+        t1 = Triple(
+            subject="repo:o/a", predicate="MENTIONS", object="repo:o/b",
+            confidence=0.4, evidence=[{"ref": "x", "note": "n1"}],
+            discovered_by="test",
+        )
+        assert store.upsert_triple(t1)
+
+        t2 = Triple(
+            subject="repo:o/a", predicate="MENTIONS", object="repo:o/b",
+            confidence=0.7, evidence=[{"ref": "y", "note": "n2"}],
+            discovered_by="test",
+        )
+        assert not store.upsert_triple(t2)  # not new
+
+        row = store._conn.execute(
+            "SELECT confidence, evidence FROM triples "
+            "WHERE subject = ? AND predicate = ? AND object = ?",
+            ("repo:o/a", "MENTIONS", "repo:o/b"),
+        ).fetchone()
+        assert row["confidence"] == 0.7
+        refs = {e["ref"] for e in json.loads(row["evidence"])}
+        assert refs == {"x", "y"}
+
+
+def test_upsert_triple_distinct_edge_objects_coexist(tmp_path):
+    """Two relationship triples with the same predicate but different objects both live."""
+    db = tmp_path / "graph.db"
+    with GraphStore(db) as store:
+        store.upsert_triple(Triple("repo:o/a", "DEPENDS_ON", "tech:click"))
+        store.upsert_triple(Triple("repo:o/a", "DEPENDS_ON", "tech:requests"))
+
+        rows = store._conn.execute(
+            "SELECT object FROM triples WHERE subject = ? AND predicate = ?",
+            ("repo:o/a", "DEPENDS_ON"),
+        ).fetchall()
+        objects = {r[0] for r in rows}
+        assert objects == {"tech:click", "tech:requests"}
+
+
+# -- Node / Edge compatibility tests -------------------------------------
 
 def test_upsert_node_and_edge_roundtrip(tmp_path):
     db = tmp_path / "graph.db"

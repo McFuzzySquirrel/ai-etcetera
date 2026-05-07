@@ -13,7 +13,7 @@ For conceptual background see [`docs/blog/`](blog/README.md).
 | 1 — Inventory + graph store | Complete | Repo inventory, SQLite storage, graph and findings writers are active. |
 | 2 — Explicit connections | Complete | Dependency and interface extraction are implemented. Coverage depends on local checkouts. |
 | 3 — Latent connections | Complete | `concept_extractor`, `origin_tracer`, and `semantic_linker` are implemented with deterministic local-first behaviour. |
-| 4 — Synthesis / curation | Partial | `connection_curator` is implemented with heuristics by default and optional Ollama-assisted scoring. The full curator CLI and richer rationale model are still pending. |
+| 4 — Synthesis / curation | Partial | `connection_curator` now runs a two-stage curation flow (heuristic shortlist, then bounded Ollama review budget). Richer rationale modeling and curator inspection helpers are still pending. |
 | 5 — Delta tracking | Complete | Findings delta is generated between runs. |
 
 ## What is implemented today
@@ -60,6 +60,9 @@ For conceptual background see [`docs/blog/`](blog/README.md).
   heuristics:
   - shared direct edge kinds
   - shared `Technology` / `Interface` neighbors
+- Two-stage curation is in place:
+  - heuristic shortlist bounded by `curation.max_candidates`
+  - Ollama review bounded by `curation.max_llm_reviews`
 - Optional Ollama support (shared `curation.*` config with `origin_tracer`) can:
   - accept or reject candidate pairs
   - adjust confidence
@@ -67,6 +70,8 @@ For conceptual background see [`docs/blog/`](blog/README.md).
 - The current CLI supports runtime checking through `dirk ollama-check`.
 - Heuristic fallback is supported when Ollama is unavailable or times out and
   `curation.fallback` is `heuristic`.
+- Architectural rationale for the bounded two-stage flow is captured in
+  [`docs/adr/ADR-0003-two-stage-curation-review-budget.md`](adr/ADR-0003-two-stage-curation-review-budget.md).
 
 ### Phase 5
 

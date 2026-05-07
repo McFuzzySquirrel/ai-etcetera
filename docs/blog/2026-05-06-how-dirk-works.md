@@ -18,6 +18,9 @@ through the key concepts behind how it works: knowledge graphs, triple stores,
 a staged skills pipeline, and local-first semantic linking. No hosting required,
 no API key needed, and the whole thing commits cleanly to git.
 
+> Update (2026-05-08): Phase 4 now includes a two-stage curation flow with an
+> explicit Ollama review budget. See [ADR-0003](../adr/ADR-0003-two-stage-curation-review-budget.md).
+
 ---
 
 ## 1. The core idea: everything is a graph
@@ -66,6 +69,13 @@ findings documents Dirk produces are essentially the result of asking
 Every edge carries a **confidence score** (0–1) and an **evidence trail** — a
 list of references that say why Dirk believes the edge exists. This makes the
 graph auditable, not a black box.
+
+### A quick look at the graph UI
+
+The interactive graph view makes these inferred and explicit connections easier
+to inspect during curation.
+
+![Dirk Graph UI overview (dark mode)](../../frontend/showcase/01-overview.png)
 
 ---
 
